@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.api.mapper.BizTemplateItemMapper">
+    
+    <resultMap type="com.ruoyi.api.domain.BizTemplateItem" id="BizTemplateItemResult">
+        <id     property="templateItemId"   column="template_item_id"    />
+        <result property="itemName"         column="item_name"           />
+        <result property="size"             column="size"                />
+        <result property="status"           column="status"              />
+        <result property="delFlag"          column="del_flag"            />
+        <result property="createBy"         column="create_by"           />
+        <result property="createTime"       column="create_time"         />
+        <result property="updateBy"         column="update_by"           />
+        <result property="updateTime"       column="update_time"         />
+        <result property="remark"           column="remark"              />
+        <result property="imageCount"       column="image_count"         />
+    </resultMap>
+
+    <resultMap type="com.ruoyi.api.domain.BizTemplateItem" id="BizTemplateItemWithImagesResult" extends="BizTemplateItemResult">
+        <collection property="images" ofType="com.ruoyi.api.domain.BizTemplateItemImage">
+            <id     property="imageId"          column="image_id"           />
+            <result property="templateItemId"   column="img_template_item_id" />
+            <result property="imageUrl"         column="image_url"          />
+            <result property="imageName"        column="image_name"         />
+            <result property="imageType"        column="image_type"         />
+            <result property="imageSize"        column="image_size"         />
+            <result property="sortOrder"        column="img_sort_order"     />
+            <result property="createBy"         column="img_create_by"      />
+            <result property="createTime"       column="img_create_time"    />
+        </collection>
+    </resultMap>
+
+    <sql id="selectBizTemplateItemVo">
+        select template_item_id, item_name, size, status, del_flag, create_by, create_time, update_by, update_time, remark 
+        from biz_template_item
+    </sql>
+
+    <select id="selectBizTemplateItemById" parameterType="Long" resultMap="BizTemplateItemResult">
+        <include refid="selectBizTemplateItemVo"/>
+        where template_item_id = #{templateItemId} and del_flag = '0'
+    </select>
+
+    <select id="selectBizTemplateItemByIdWithImages" parameterType="Long" resultMap="BizTemplateItemWithImagesResult">
+        select 
+            ti.template_item_id, ti.item_name, ti.size, ti.status, ti.del_flag, 
+            ti.create_by, ti.create_time, ti.update_by, ti.update_time, ti.remark,
+            img.image_id, img.template_item_id as img_template_item_id, img.image_url, 
+            img.image_name, img.image_type, img.image_size, img.sort_order as img_sort_order,
+            img.create_by as img_create_by, img.create_time as img_create_time
+        from biz_template_item ti
+        left join biz_template_item_image img on ti.template_item_id = img.template_item_id and img.del_flag = '0'
+        where ti.template_item_id = #{templateItemId} and ti.del_flag = '0'
+        order by img.sort_order asc
+    </select>
+
+    <select id="selectBizTemplateItemList" parameterType="com.ruoyi.api.domain.BizTemplateItem" resultMap="BizTemplateItemResult">
+        <include refid="selectBizTemplateItemVo"/>
+        <where>
+            del_flag = '0'
+            <if test="itemName != null and itemName != ''">
+                AND item_name like concat('%', #{itemName}, '%')
+            </if>
+            <if test="size != null and size != ''">
+                AND size = #{size}
+            </if>
+            <if test="status != null and status != ''">
+                AND status = #{status}
+            </if>
+        </where>
+        order by create_time desc
+    </select>
+
+    <select id="selectBizTemplateItemListWithImageCount" parameterType="com.ruoyi.api.domain.BizTemplateItem" resultMap="BizTemplateItemResult">
+        select 
+            ti.template_item_id, ti.item_name, ti.size, ti.status, ti.del_flag, 
+            ti.create_by, ti.create_time, ti.update_by, ti.update_time, ti.remark,
+            (select count(*) from biz_template_item_image img where img.template_item_id = ti.template_item_id and img.del_flag = '0') as image_count
+        from biz_template_item ti
+        <where>
+            ti.del_flag = '0'
+            <if test="itemName != null and itemName != ''">
+                AND ti.item_name like concat('%', #{itemName}, '%')
+            </if>
+            <if test="size != null and size != ''">
+                AND ti.size = #{size}
+            </if>
+            <if test="status != null and status != ''">
+                AND ti.status = #{status}
+            </if>
+        </where>
+        order by ti.create_time desc
+    </select>
+
+    <select id="selectAllActiveTemplateItems" resultMap="BizTemplateItemResult">
+        <include refid="selectBizTemplateItemVo"/>
+        where del_flag = '0' and status = '0'
+        order by create_time asc
+    </select>
+
+    <select id="selectBizTemplateItemByIds" resultMap="BizTemplateItemResult">
+        <include refid="selectBizTemplateItemVo"/>
+        where del_flag = '0' and template_item_id in
+        <foreach item="templateItemId" collection="templateItemIds" open="(" separator="," close=")">
+            #{templateItemId}
+        </foreach>
+    </select>
+
+    <insert id="insertBizTemplateItem" parameterType="com.ruoyi.api.domain.BizTemplateItem" useGeneratedKeys="true" keyProperty="templateItemId">
+        insert into biz_template_item
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="itemName != null and itemName != ''">item_name,</if>
+            <if test="size != null">size,</if>
+            <if test="status != null">status,</if>
+            <if test="delFlag != null">del_flag,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="remark != null">remark,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="itemName != null and itemName != ''">#{itemName},</if>
+            <if test="size != null">#{size},</if>
+            <if test="status != null">#{status},</if>
+            <if test="delFlag != null">#{delFlag},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="remark != null">#{remark},</if>
+        </trim>
+    </insert>
+
+    <update id="updateBizTemplateItem" parameterType="com.ruoyi.api.domain.BizTemplateItem">
+        update biz_template_item
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="itemName != null and itemName != ''">item_name = #{itemName},</if>
+            <if test="size != null">size = #{size},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </trim>
+        where template_item_id = #{templateItemId}
+    </update>
+
+    <update id="deleteBizTemplateItemById" parameterType="Long">
+        update biz_template_item set del_flag = '2' where template_item_id = #{templateItemId}
+    </update>
+
+    <update id="deleteBizTemplateItemByIds" parameterType="String">
+        update biz_template_item set del_flag = '2' where template_item_id in 
+        <foreach item="templateItemId" collection="array" open="(" separator="," close=")">
+            #{templateItemId}
+        </foreach>
+    </update>
+
+    <select id="checkTemplateItemInUse" parameterType="Long" resultType="int">
+        select count(*) from biz_template_price 
+        where default_item_id = #{templateItemId} and del_flag = '0'
+    </select>
+
+</mapper>

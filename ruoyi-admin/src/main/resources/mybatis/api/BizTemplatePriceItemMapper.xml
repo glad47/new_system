@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.api.mapper.BizTemplatePriceItemMapper">
+    
+    <resultMap type="com.ruoyi.api.domain.BizTemplatePriceItem" id="BizTemplatePriceItemResult">
+        <id     property="id"               column="id"                 />
+        <result property="templatePriceId"  column="template_price_id"  />
+        <result property="templateItemId"   column="template_item_id"   />
+        <result property="sortOrder"        column="sort_order"         />
+        <result property="delFlag"          column="del_flag"           />
+        <result property="createBy"         column="create_by"          />
+        <result property="createTime"       column="create_time"        />
+        <result property="updateBy"         column="update_by"          />
+        <result property="updateTime"       column="update_time"        />
+    </resultMap>
+
+    <resultMap type="com.ruoyi.api.domain.BizTemplatePriceItem" id="BizTemplatePriceItemWithDetailsResult" extends="BizTemplatePriceItemResult">
+        <association property="templateItem" javaType="com.ruoyi.api.domain.BizTemplateItem">
+            <id     property="templateItemId"   column="ti_template_item_id"    />
+            <result property="itemName"         column="ti_item_name"           />
+            <result property="size"             column="ti_size"                />
+            <result property="status"           column="ti_status"              />
+            <result property="remark"           column="ti_remark"              />
+            <result property="imageCount"       column="ti_image_count"         />
+        </association>
+    </resultMap>
+
+    <sql id="selectBizTemplatePriceItemVo">
+        select id, template_price_id, template_item_id, sort_order, del_flag, create_by, create_time, update_by, update_time 
+        from biz_template_price_item
+    </sql>
+
+    <select id="selectBizTemplatePriceItemById" parameterType="Long" resultMap="BizTemplatePriceItemResult">
+        <include refid="selectBizTemplatePriceItemVo"/>
+        where id = #{id} and del_flag = '0'
+    </select>
+
+    <select id="selectBizTemplatePriceItemByPriceId" parameterType="Long" resultMap="BizTemplatePriceItemResult">
+        <include refid="selectBizTemplatePriceItemVo"/>
+        where template_price_id = #{templatePriceId} and del_flag = '0'
+        order by sort_order asc
+    </select>
+
+    <select id="selectBizTemplatePriceItemByPriceIdWithDetails" parameterType="Long" resultMap="BizTemplatePriceItemWithDetailsResult">
+        select 
+            tpi.id, tpi.template_price_id, tpi.template_item_id, tpi.sort_order, 
+            tpi.del_flag, tpi.create_by, tpi.create_time, tpi.update_by, tpi.update_time,
+            ti.template_item_id as ti_template_item_id, ti.item_name as ti_item_name, 
+            ti.size as ti_size, ti.status as ti_status, ti.remark as ti_remark,
+            (select count(*) from biz_template_item_image img where img.template_item_id = ti.template_item_id and img.del_flag = '0') as ti_image_count
+        from biz_template_price_item tpi
+        left join biz_template_item ti on tpi.template_item_id = ti.template_item_id and ti.del_flag = '0'
+        where tpi.template_price_id = #{templatePriceId} and tpi.del_flag = '0'
+        order by tpi.sort_order asc
+    </select>
+
+    <select id="selectBizTemplatePriceItemList" parameterType="com.ruoyi.api.domain.BizTemplatePriceItem" resultMap="BizTemplatePriceItemResult">
+        <include refid="selectBizTemplatePriceItemVo"/>
+        <where>
+            del_flag = '0'
+            <if test="templatePriceId != null">
+                AND template_price_id = #{templatePriceId}
+            </if>
+            <if test="templateItemId != null">
+                AND template_item_id = #{templateItemId}
+            </if>
+        </where>
+        order by sort_order asc
+    </select>
+
+    <insert id="insertBizTemplatePriceItem" parameterType="com.ruoyi.api.domain.BizTemplatePriceItem" useGeneratedKeys="true" keyProperty="id">
+        insert into biz_template_price_item
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="templatePriceId != null">template_price_id,</if>
+            <if test="templateItemId != null">template_item_id,</if>
+            <if test="sortOrder != null">sort_order,</if>
+            <if test="delFlag != null">del_flag,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="templatePriceId != null">#{templatePriceId},</if>
+            <if test="templateItemId != null">#{templateItemId},</if>
+            <if test="sortOrder != null">#{sortOrder},</if>
+            <if test="delFlag != null">#{delFlag},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+        </trim>
+    </insert>
+
+    <insert id="batchInsertBizTemplatePriceItem" parameterType="java.util.List">
+        insert into biz_template_price_item (
+            template_price_id, template_item_id, sort_order, del_flag, create_by, create_time
+        ) values
+        <foreach item="item" index="index" collection="list" separator=",">
+            (
+                #{item.templatePriceId},
+                #{item.templateItemId},
+                #{item.sortOrder},
+                '0',
+                #{item.createBy},
+                #{item.createTime}
+            )
+        </foreach>
+    </insert>
+
+    <update id="updateBizTemplatePriceItem" parameterType="com.ruoyi.api.domain.BizTemplatePriceItem">
+        update biz_template_price_item
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="sortOrder != null">sort_order = #{sortOrder},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <update id="deleteBizTemplatePriceItemById" parameterType="Long">
+        update biz_template_price_item set del_flag = '2' where id = #{id}
+    </update>
+
+    <update id="deleteBizTemplatePriceItemByPriceId" parameterType="Long">
+        update biz_template_price_item set del_flag = '2' where template_price_id = #{templatePriceId}
+    </update>
+
+    <update id="deleteBizTemplatePriceItemByIds" parameterType="String">
+        update biz_template_price_item set del_flag = '2' where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+
+    <select id="checkTemplateItemExists" resultType="int">
+        select count(*) from biz_template_price_item 
+        where template_price_id = #{templatePriceId} 
+        and template_item_id = #{templateItemId} 
+        and del_flag = '0'
+    </select>
+
+</mapper>
