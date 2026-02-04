@@ -1,9 +1,5 @@
 package com.ruoyi.api.domain;
 
-import java.util.List;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
@@ -12,6 +8,7 @@ import com.ruoyi.common.core.domain.BaseEntity;
 
 /**
  * Template Item Entity biz_template_item
+ * Each item belongs to a Template and has ONE image
  * 
  * @author ruoyi
  */
@@ -22,16 +19,42 @@ public class BizTemplateItem extends BaseEntity
     /** Template Item ID */
     private Long templateItemId;
 
-    /** Item Name */
+    /** Template ID (FK) - belongs to template */
+    private Long templateId;
+
+    /** Price Template ID (FK, optional) - reference to price template */
+    private Long priceTemplateId;
+
+    /** Price Template - loaded relation */
+    private BizPriceTemplate priceTemplate;
+
+    /** Item Name (fallback if no price template) */
     @Excel(name = "Item Name")
-    @NotBlank(message = "Item name cannot be empty")
     @Size(min = 0, max = 100, message = "Item name cannot exceed 100 characters")
     private String itemName;
 
-    /** Size */
-    @Excel(name = "Size")
-    @Size(min = 0, max = 50, message = "Size cannot exceed 50 characters")
-    private String size;
+    /** Image URL (MinIO) - ONE image per item */
+    @Excel(name = "Image URL")
+    @Size(min = 0, max = 500, message = "Image URL cannot exceed 500 characters")
+    private String imageUrl;
+
+    /** Image Name */
+    @Size(min = 0, max = 200, message = "Image name cannot exceed 200 characters")
+    private String imageName;
+
+    /** Image Type (e.g., jpg, png) */
+    @Size(min = 0, max = 50, message = "Image type cannot exceed 50 characters")
+    private String imageType;
+
+    /** Image Size (bytes) */
+    private Long imageSize;
+
+    /** Is Default Item (0=No, 1=Yes) */
+    @Excel(name = "Is Default", readConverterExp = "0=No,1=Yes")
+    private String isDefault;
+
+    /** Sort Order */
+    private Integer sortOrder;
 
     /** Status (0=Normal, 1=Disabled) */
     @Excel(name = "Status", readConverterExp = "0=Normal,1=Disabled")
@@ -40,25 +63,44 @@ public class BizTemplateItem extends BaseEntity
     /** Delete Flag (0=Exist, 2=Deleted) */
     private String delFlag;
 
-    /** Image list - for display purposes */
-    private List<BizTemplateItemImage> images;
-
-    /** Image count - for list view */
-    private Integer imageCount;
+    public Long getTemplateItemId()
+    {
+        return templateItemId;
+    }
 
     public void setTemplateItemId(Long templateItemId)
     {
         this.templateItemId = templateItemId;
     }
 
-    public Long getTemplateItemId()
+    public Long getTemplateId()
     {
-        return templateItemId;
+        return templateId;
     }
 
-    public void setItemName(String itemName)
+    public void setTemplateId(Long templateId)
     {
-        this.itemName = itemName;
+        this.templateId = templateId;
+    }
+
+    public Long getPriceTemplateId()
+    {
+        return priceTemplateId;
+    }
+
+    public void setPriceTemplateId(Long priceTemplateId)
+    {
+        this.priceTemplateId = priceTemplateId;
+    }
+
+    public BizPriceTemplate getPriceTemplate()
+    {
+        return priceTemplate;
+    }
+
+    public void setPriceTemplate(BizPriceTemplate priceTemplate)
+    {
+        this.priceTemplate = priceTemplate;
     }
 
     public String getItemName()
@@ -66,19 +108,69 @@ public class BizTemplateItem extends BaseEntity
         return itemName;
     }
 
-    public void setSize(String size)
+    public void setItemName(String itemName)
     {
-        this.size = size;
+        this.itemName = itemName;
     }
 
-    public String getSize()
+    public String getImageUrl()
     {
-        return size;
+        return imageUrl;
     }
 
-    public void setStatus(String status)
+    public void setImageUrl(String imageUrl)
     {
-        this.status = status;
+        this.imageUrl = imageUrl;
+    }
+
+    public String getImageName()
+    {
+        return imageName;
+    }
+
+    public void setImageName(String imageName)
+    {
+        this.imageName = imageName;
+    }
+
+    public String getImageType()
+    {
+        return imageType;
+    }
+
+    public void setImageType(String imageType)
+    {
+        this.imageType = imageType;
+    }
+
+    public Long getImageSize()
+    {
+        return imageSize;
+    }
+
+    public void setImageSize(Long imageSize)
+    {
+        this.imageSize = imageSize;
+    }
+
+    public String getIsDefault()
+    {
+        return isDefault;
+    }
+
+    public void setIsDefault(String isDefault)
+    {
+        this.isDefault = isDefault;
+    }
+
+    public Integer getSortOrder()
+    {
+        return sortOrder;
+    }
+
+    public void setSortOrder(Integer sortOrder)
+    {
+        this.sortOrder = sortOrder;
     }
 
     public String getStatus()
@@ -86,9 +178,9 @@ public class BizTemplateItem extends BaseEntity
         return status;
     }
 
-    public void setDelFlag(String delFlag)
+    public void setStatus(String status)
     {
-        this.delFlag = delFlag;
+        this.status = status;
     }
 
     public String getDelFlag()
@@ -96,32 +188,21 @@ public class BizTemplateItem extends BaseEntity
         return delFlag;
     }
 
-    public List<BizTemplateItemImage> getImages()
+    public void setDelFlag(String delFlag)
     {
-        return images;
-    }
-
-    public void setImages(List<BizTemplateItemImage> images)
-    {
-        this.images = images;
-    }
-
-    public Integer getImageCount()
-    {
-        return imageCount;
-    }
-
-    public void setImageCount(Integer imageCount)
-    {
-        this.imageCount = imageCount;
+        this.delFlag = delFlag;
     }
 
     @Override
     public String toString() {
         return new ToStringBuilder(this, ToStringStyle.MULTI_LINE_STYLE)
             .append("templateItemId", getTemplateItemId())
+            .append("templateId", getTemplateId())
+            .append("priceTemplateId", getPriceTemplateId())
             .append("itemName", getItemName())
-            .append("size", getSize())
+            .append("imageUrl", getImageUrl())
+            .append("isDefault", getIsDefault())
+            .append("sortOrder", getSortOrder())
             .append("status", getStatus())
             .append("delFlag", getDelFlag())
             .append("createBy", getCreateBy())

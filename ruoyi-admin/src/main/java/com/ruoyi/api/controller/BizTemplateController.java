@@ -24,25 +24,26 @@ import com.ruoyi.common.utils.poi.ExcelUtil;
 
 /**
  * Template Controller
+ * Manages templates with their items (each item has one image)
  * 
  * @author ruoyi
  */
 @RestController
-@RequestMapping("/api/template")
+@RequestMapping("/template")
 public class BizTemplateController extends BaseController
 {
     @Autowired
     private IBizTemplateService bizTemplateService;
 
     /**
-     * Query template list (paginated) with relations
+     * Query template list (paginated) with items
      */
     @PreAuthorize("@ss.hasPermi('biz:template:list')")
     @GetMapping("/list")
     public TableDataInfo list(BizTemplate bizTemplate)
     {
         startPage();
-        List<BizTemplate> list = bizTemplateService.selectBizTemplateListWithRelations(bizTemplate);
+        List<BizTemplate> list = bizTemplateService.selectBizTemplateListWithItems(bizTemplate);
         return getDataTable(list);
     }
 
@@ -60,21 +61,22 @@ public class BizTemplateController extends BaseController
     }
 
     /**
-     * Get template detail with all relations
+     * Get template detail with items
      */
     @PreAuthorize("@ss.hasPermi('biz:template:query')")
     @GetMapping(value = "/{templateId}")
     public AjaxResult getInfo(@PathVariable("templateId") Long templateId)
     {
-        return success(bizTemplateService.selectBizTemplateByIdWithRelations(templateId));
+        return success(bizTemplateService.selectBizTemplateByIdWithItems(templateId));
     }
 
     /**
-     * Add template
-     * This automatically creates:
-     * - biz_template record
-     * - biz_template_price record (1:1)
-     * - biz_template_price_item records (for ALL active template items)
+     * Add template with items
+     * Request body should include templateItems array with:
+     * - priceTemplateId (optional)
+     * - itemName (optional, fallback name)
+     * - imageUrl (single image)
+     * - isDefault ('0' or '1')
      */
     @PreAuthorize("@ss.hasPermi('biz:template:add')")
     @Log(title = "Template", businessType = BusinessType.INSERT)
@@ -85,7 +87,8 @@ public class BizTemplateController extends BaseController
     }
 
     /**
-     * Update template
+     * Update template with items
+     * This replaces all existing items with the new items
      */
     @PreAuthorize("@ss.hasPermi('biz:template:edit')")
     @Log(title = "Template", businessType = BusinessType.UPDATE)
@@ -96,7 +99,7 @@ public class BizTemplateController extends BaseController
     }
 
     /**
-     * Delete template
+     * Delete template (cascade deletes items)
      */
     @PreAuthorize("@ss.hasPermi('biz:template:remove')")
     @Log(title = "Template", businessType = BusinessType.DELETE)
@@ -114,16 +117,5 @@ public class BizTemplateController extends BaseController
     public AjaxResult checkTemplateName(BizTemplate bizTemplate)
     {
         return success(bizTemplateService.checkTemplateNameUnique(bizTemplate));
-    }
-
-    /**
-     * Sync template price items with all active template items
-     */
-    @PreAuthorize("@ss.hasPermi('biz:template:edit')")
-    @Log(title = "Template Sync", businessType = BusinessType.UPDATE)
-    @PostMapping("/sync/{templateId}")
-    public AjaxResult syncPriceItems(@PathVariable Long templateId)
-    {
-        return toAjax(bizTemplateService.syncTemplatePriceItems(templateId));
     }
 }

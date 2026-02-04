@@ -13,72 +13,72 @@ public interface BizTemplateMapper
     /**
      * Query template by ID
      * 
-     * @param templateId Template ID
-     * @return Template
+     * @param templateId template ID
+     * @return template
      */
     public BizTemplate selectBizTemplateById(Long templateId);
 
     /**
-     * Query template by ID with all relations (price, items, images)
+     * Query template by ID with template items
      * 
-     * @param templateId Template ID
-     * @return Template with relations
+     * @param templateId template ID
+     * @return template with items
      */
-    public BizTemplate selectBizTemplateByIdWithRelations(Long templateId);
+    public BizTemplate selectBizTemplateByIdWithItems(Long templateId);
 
     /**
      * Query template list
      * 
-     * @param bizTemplate Query conditions
-     * @return Template list
+     * @param bizTemplate template query params
+     * @return template list
      */
     public List<BizTemplate> selectBizTemplateList(BizTemplate bizTemplate);
 
     /**
-     * Query template list with template price and default item info
+     * Query template list with template items
      * 
-     * @param bizTemplate Query conditions
-     * @return Template list with relations
+     * @param bizTemplate template query params
+     * @return template list with items
      */
-    public List<BizTemplate> selectBizTemplateListWithRelations(BizTemplate bizTemplate);
+    public List<BizTemplate> selectBizTemplateListWithItems(BizTemplate bizTemplate);
 
     /**
      * Insert template
      * 
-     * @param bizTemplate Template
-     * @return Rows affected
+     * @param bizTemplate template
+     * @return affected rows
      */
     public int insertBizTemplate(BizTemplate bizTemplate);
 
     /**
      * Update template
      * 
-     * @param bizTemplate Template
-     * @return Rows affected
+     * @param bizTemplate template
+     * @return affected rows
      */
     public int updateBizTemplate(BizTemplate bizTemplate);
 
     /**
-     * Delete template by ID (soft delete)
+     * Delete template by ID
      * 
-     * @param templateId Template ID
-     * @return Rows affected
+     * @param templateId template ID
+     * @return affected rows
      */
     public int deleteBizTemplateById(Long templateId);
 
     /**
-     * Batch delete templates (soft delete)
+     * Batch delete templates
      * 
-     * @param templateIds Template IDs
-     * @return Rows affected
+     * @param templateIds template IDs
+     * @return affected rows
      */
     public int deleteBizTemplateByIds(Long[] templateIds);
 
     /**
-     * Check if template name exists
+     * Check if template name is unique
      * 
-     * @param templateName Template name
-     * @return Template with same name
+     * @param templateName template name
+     * @return template info
      */
     public BizTemplate checkTemplateNameUnique(String templateName);
 }

@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.api.mapper.BizTemplateMapper">
+    
+    <resultMap type="com.ruoyi.api.domain.BizTemplate" id="BizTemplateResult">
+        <id     property="templateId"     column="template_id"     />
+        <result property="templateName"   column="template_name"   />
+        <result property="note"           column="note"            />
+        <result property="status"         column="status"          />
+        <result property="delFlag"        column="del_flag"        />
+        <result property="createBy"       column="create_by"       />
+        <result property="createTime"     column="create_time"     />
+        <result property="updateBy"       column="update_by"       />
+        <result property="updateTime"     column="update_time"     />
+        <result property="remark"         column="remark"          />
+    </resultMap>
+
+    <sql id="selectBizTemplateVo">
+        select template_id, template_name, note, status, del_flag, 
+               create_by, create_time, update_by, update_time, remark
+        from biz_template
+    </sql>
+
+    <select id="selectBizTemplateList" parameterType="com.ruoyi.api.domain.BizTemplate" resultMap="BizTemplateResult">
+        <include refid="selectBizTemplateVo"/>
+        <where>
+            del_flag = '0'
+            <if test="templateName != null and templateName != ''">
+                AND template_name like concat('%', #{templateName}, '%')
+            </if>
+            <if test="status != null and status != ''">
+                AND status = #{status}
+            </if>
+            <if test="params.beginTime != null and params.beginTime != ''">
+                AND create_time &gt;= #{params.beginTime}
+            </if>
+            <if test="params.endTime != null and params.endTime != ''">
+                AND create_time &lt;= #{params.endTime}
+            </if>
+        </where>
+        order by create_time desc
+    </select>
+
+    <select id="selectBizTemplateById" parameterType="Long" resultMap="BizTemplateResult">
+        <include refid="selectBizTemplateVo"/>
+        where template_id = #{templateId} and del_flag = '0'
+    </select>
+
+    <select id="selectBizTemplateByIdWithItems" parameterType="Long" resultMap="BizTemplateResult">
+        <include refid="selectBizTemplateVo"/>
+        where template_id = #{templateId} and del_flag = '0'
+    </select>
+
+    <select id="checkTemplateNameUnique" parameterType="String" resultMap="BizTemplateResult">
+        select template_id, template_name from biz_template
+        where template_name = #{templateName} and del_flag = '0'
+        limit 1
+    </select>
+
+    <insert id="insertBizTemplate" parameterType="com.ruoyi.api.domain.BizTemplate" useGeneratedKeys="true" keyProperty="templateId">
+        insert into biz_template
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="templateName != null and templateName != ''">template_name,</if>
+            <if test="note != null">note,</if>
+            <if test="status != null">status,</if>
+            <if test="delFlag != null">del_flag,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="remark != null">remark,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="templateName != null and templateName != ''">#{templateName},</if>
+            <if test="note != null">#{note},</if>
+            <if test="status != null">#{status},</if>
+            <if test="delFlag != null">#{delFlag},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="remark != null">#{remark},</if>
+        </trim>
+    </insert>
+
+    <update id="updateBizTemplate" parameterType="com.ruoyi.api.domain.BizTemplate">
+        update biz_template
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="templateName != null and templateName != ''">template_name = #{templateName},</if>
+            <if test="note != null">note = #{note},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </trim>
+        where template_id = #{templateId}
+    </update>
+
+    <update id="deleteBizTemplateById" parameterType="Long">
+        update biz_template set del_flag = '2' where template_id = #{templateId}
+    </update>
+
+    <update id="deleteBizTemplateByIds" parameterType="String">
+        update biz_template set del_flag = '2' where template_id in 
+        <foreach item="templateId" collection="array" open="(" separator="," close=")">
+            #{templateId}
+        </foreach>
+    </update>
+
+</mapper>

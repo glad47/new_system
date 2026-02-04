@@ -1,20 +1,14 @@
 package com.ruoyi.api.service.impl;
 
-import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.ruoyi.api.domain.BizTemplate;
 import com.ruoyi.api.domain.BizTemplateItem;
-import com.ruoyi.api.domain.BizTemplatePrice;
-import com.ruoyi.api.domain.BizTemplatePriceItem;
 import com.ruoyi.api.mapper.BizTemplateItemMapper;
 import com.ruoyi.api.mapper.BizTemplateMapper;
-import com.ruoyi.api.mapper.BizTemplatePriceItemMapper;
-import com.ruoyi.api.mapper.BizTemplatePriceMapper;
 import com.ruoyi.api.service.IBizTemplateService;
-import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.common.utils.SecurityUtils;
@@ -32,12 +26,6 @@ public class BizTemplateServiceImpl implements IBizTemplateService
     private BizTemplateMapper bizTemplateMapper;
 
     @Autowired
-    private BizTemplatePriceMapper bizTemplatePriceMapper;
-
-    @Autowired
-    private BizTemplatePriceItemMapper bizTemplatePriceItemMapper;
-
-    @Autowired
     private BizTemplateItemMapper bizTemplateItemMapper;
 
     /**
@@ -50,30 +38,17 @@ public class BizTemplateServiceImpl implements IBizTemplateService
     }
 
     /**
-     * Query template by ID with all relations
+     * Query template by ID with template items
      */
     @Override
-    public BizTemplate selectBizTemplateByIdWithRelations(Long templateId)
+    public BizTemplate selectBizTemplateByIdWithItems(Long templateId)
     {
-        BizTemplate template = bizTemplateMapper.selectBizTemplateByIdWithRelations(templateId);
-        if (template != null && template.getTemplatePrice() != null)
+        BizTemplate template = bizTemplateMapper.selectBizTemplateById(templateId);
+        if (template != null)
         {
-            // Load template items with images
-            List<BizTemplatePriceItem> priceItems = bizTemplatePriceItemMapper
-                .selectBizTemplatePriceItemByPriceIdWithDetails(template.getTemplatePrice().getTemplatePriceId());
-            
-            List<BizTemplateItem> items = new ArrayList<>();
-            for (BizTemplatePriceItem priceItem : priceItems)
-            {
-                if (priceItem.getTemplateItem() != null)
-                {
-                    items.add(priceItem.getTemplateItem());
-                }
-            }
+            // Load template items with price template relation
+            List<BizTemplateItem> items = bizTemplateItemMapper.selectBizTemplateItemsByTemplateIdWithRelation(templateId);
             template.setTemplateItems(items);
-            
-            // Set convenience fields
-            template.setDefaultItemId(template.getTemplatePrice().getDefaultItemId());
         }
         return template;
     }
@@ -88,16 +63,22 @@ public class BizTemplateServiceImpl implements IBizTemplateService
     }
 
     /**
-     * Query template list with relations
+     * Query template list with template items
      */
     @Override
-    public List<BizTemplate> selectBizTemplateListWithRelations(BizTemplate bizTemplate)
+    public List<BizTemplate> selectBizTemplateListWithItems(BizTemplate bizTemplate)
     {
-        return bizTemplateMapper.selectBizTemplateListWithRelations(bizTemplate);
+        List<BizTemplate> templates = bizTemplateMapper.selectBizTemplateList(bizTemplate);
+        for (BizTemplate template : templates)
+        {
+            List<BizTemplateItem> items = bizTemplateItemMapper.selectBizTemplateItemsByTemplateIdWithRelation(template.getTemplateId());
+            template.setTemplateItems(items);
+        }
+        return templates;
     }
 
     /**
-     * Insert template with template price and all active template items
+     * Insert template with items
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -105,61 +86,39 @@ public class BizTemplateServiceImpl implements IBizTemplateService
     {
         String username = SecurityUtils.getUsername();
         
-        // Validate default item ID
-        if (bizTemplate.getDefaultItemId() == null)
-        {
-            throw new ServiceException("Default template item must be selected");
-        }
-        
         // Check template name uniqueness
         if (!checkTemplateNameUnique(bizTemplate))
         {
             throw new ServiceException("Template name '" + bizTemplate.getTemplateName() + "' already exists");
         }
         
+        // Validate at least one template item with isDefault = '1'
+        validateTemplateItems(bizTemplate.getTemplateItems());
+        
         // 1. Insert template
         bizTemplate.setCreateBy(username);
         bizTemplate.setCreateTime(DateUtils.getNowDate());
         int rows = bizTemplateMapper.insertBizTemplate(bizTemplate);
         
-        if (rows > 0)
+        if (rows > 0 && bizTemplate.getTemplateItems() != null && !bizTemplate.getTemplateItems().isEmpty())
         {
-            // 2. Insert template price (1:1)
-            BizTemplatePrice templatePrice = new BizTemplatePrice();
-            templatePrice.setTemplateId(bizTemplate.getTemplateId());
-            templatePrice.setDefaultItemId(bizTemplate.getDefaultItemId());
-            templatePrice.setCreateBy(username);
-            templatePrice.setCreateTime(DateUtils.getNowDate());
-            bizTemplatePriceMapper.insertBizTemplatePrice(templatePrice);
-            
-            // 3. Insert template price items for ALL active template items
-            List<BizTemplateItem> allActiveItems = bizTemplateItemMapper.selectAllActiveTemplateItems();
-            if (allActiveItems != null && !allActiveItems.isEmpty())
+            // 2. Insert template items
+            for (int i = 0; i < bizTemplate.getTemplateItems().size(); i++)
             {
-                List<BizTemplatePriceItem> priceItems = new ArrayList<>();
-                int sortOrder = 0;
-                for (BizTemplateItem item : allActiveItems)
-                {
-                    BizTemplatePriceItem priceItem = new BizTemplatePriceItem();
-                    priceItem.setTemplatePriceId(templatePrice.getTemplatePriceId());
-                    priceItem.setTemplateItemId(item.getTemplateItemId());
-                    priceItem.setSortOrder(sortOrder++);
-                    priceItem.setCreateBy(username);
-                    priceItem.setCreateTime(DateUtils.getNowDate());
-                    priceItems.add(priceItem);
-                }
-                if (!priceItems.isEmpty())
-                {
-                    bizTemplatePriceItemMapper.batchInsertBizTemplatePriceItem(priceItems);
-                }
+                BizTemplateItem item = bizTemplate.getTemplateItems().get(i);
+                item.setTemplateId(bizTemplate.getTemplateId());
+                item.setSortOrder(i);
+                item.setCreateBy(username);
+                item.setCreateTime(DateUtils.getNowDate());
             }
+            bizTemplateItemMapper.batchInsertBizTemplateItem(bizTemplate.getTemplateItems());
         }
         
         return rows;
     }
 
     /**
-     * Update template
+     * Update template with items
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -167,17 +126,14 @@ public class BizTemplateServiceImpl implements IBizTemplateService
     {
         String username = SecurityUtils.getUsername();
         
-        // Validate default item ID
-        if (bizTemplate.getDefaultItemId() == null)
-        {
-            throw new ServiceException("Default template item must be selected");
-        }
-        
         // Check template name uniqueness
         if (!checkTemplateNameUnique(bizTemplate))
         {
             throw new ServiceException("Template name '" + bizTemplate.getTemplateName() + "' already exists");
         }
+        
+        // Validate at least one template item with isDefault = '1'
+        validateTemplateItems(bizTemplate.getTemplateItems());
         
         // 1. Update template
         bizTemplate.setUpdateBy(username);
@@ -186,29 +142,22 @@ public class BizTemplateServiceImpl implements IBizTemplateService
         
         if (rows > 0)
         {
-            // 2. Update template price (change default item if needed)
-            BizTemplatePrice templatePrice = bizTemplatePriceMapper
-                .selectBizTemplatePriceByTemplateId(bizTemplate.getTemplateId());
+            // 2. Delete existing template items
+            bizTemplateItemMapper.deleteBizTemplateItemsByTemplateId(bizTemplate.getTemplateId());
             
-            if (templatePrice != null)
+            // 3. Insert new template items
+            if (bizTemplate.getTemplateItems() != null && !bizTemplate.getTemplateItems().isEmpty())
             {
-                templatePrice.setDefaultItemId(bizTemplate.getDefaultItemId());
-                templatePrice.setUpdateBy(username);
-                templatePrice.setUpdateTime(DateUtils.getNowDate());
-                bizTemplatePriceMapper.updateBizTemplatePrice(templatePrice);
-            }
-            else
-            {
-                // Create template price if not exists (edge case)
-                templatePrice = new BizTemplatePrice();
-                templatePrice.setTemplateId(bizTemplate.getTemplateId());
-                templatePrice.setDefaultItemId(bizTemplate.getDefaultItemId());
-                templatePrice.setCreateBy(username);
-                templatePrice.setCreateTime(DateUtils.getNowDate());
-                bizTemplatePriceMapper.insertBizTemplatePrice(templatePrice);
-                
-                // Also create price items
-                syncTemplatePriceItems(bizTemplate.getTemplateId());
+                for (int i = 0; i < bizTemplate.getTemplateItems().size(); i++)
+                {
+                    BizTemplateItem item = bizTemplate.getTemplateItems().get(i);
+                    item.setTemplateItemId(null); // New insert
+                    item.setTemplateId(bizTemplate.getTemplateId());
+                    item.setSortOrder(i);
+                    item.setCreateBy(username);
+                    item.setCreateTime(DateUtils.getNowDate());
+                }
+                bizTemplateItemMapper.batchInsertBizTemplateItem(bizTemplate.getTemplateItems());
             }
         }
         
@@ -216,23 +165,14 @@ public class BizTemplateServiceImpl implements IBizTemplateService
     }
 
     /**
-     * Delete template by ID
+     * Delete template by ID (cascade deletes items)
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public int deleteBizTemplateById(Long templateId)
     {
-        // Get template price first
-        BizTemplatePrice templatePrice = bizTemplatePriceMapper.selectBizTemplatePriceByTemplateId(templateId);
-        
-        if (templatePrice != null)
-        {
-            // Delete price items first
-            bizTemplatePriceItemMapper.deleteBizTemplatePriceItemByPriceId(templatePrice.getTemplatePriceId());
-            
-            // Delete template price
-            bizTemplatePriceMapper.deleteBizTemplatePriceByTemplateId(templateId);
-        }
+        // Delete template items first
+        bizTemplateItemMapper.deleteBizTemplateItemsByTemplateId(templateId);
         
         // Delete template
         return bizTemplateMapper.deleteBizTemplateById(templateId);
@@ -245,15 +185,13 @@ public class BizTemplateServiceImpl implements IBizTemplateService
     @Transactional(rollbackFor = Exception.class)
     public int deleteBizTemplateByIds(Long[] templateIds)
     {
+        // Delete template items for each template
         for (Long templateId : templateIds)
         {
-            BizTemplatePrice templatePrice = bizTemplatePriceMapper.selectBizTemplatePriceByTemplateId(templateId);
-            if (templatePrice != null)
-            {
-                bizTemplatePriceItemMapper.deleteBizTemplatePriceItemByPriceId(templatePrice.getTemplatePriceId());
-                bizTemplatePriceMapper.deleteBizTemplatePriceByTemplateId(templateId);
-            }
+            bizTemplateItemMapper.deleteBizTemplateItemsByTemplateId(templateId);
         }
+        
+        // Delete templates
         return bizTemplateMapper.deleteBizTemplateByIds(templateIds);
     }
 
@@ -273,120 +211,28 @@ public class BizTemplateServiceImpl implements IBizTemplateService
     }
 
     /**
-     * Sync template price items with all active template items
+     * Validate template items
      */
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public int syncTemplatePriceItems(Long templateId)
+    private void validateTemplateItems(List<BizTemplateItem> items)
     {
-        String username = SecurityUtils.getUsername();
-        
-        BizTemplatePrice templatePrice = bizTemplatePriceMapper.selectBizTemplatePriceByTemplateId(templateId);
-        if (templatePrice == null)
+        if (items == null || items.isEmpty())
         {
-            return 0;
+            throw new ServiceException("Template must have at least one item");
         }
         
-        // Get existing price items
-        List<BizTemplatePriceItem> existingItems = bizTemplatePriceItemMapper
-            .selectBizTemplatePriceItemByPriceId(templatePrice.getTemplatePriceId());
+        // Check that exactly one item is marked as default
+        long defaultCount = items.stream()
+            .filter(item -> "1".equals(item.getIsDefault()))
+            .count();
         
-        // Get all active template items
-        List<BizTemplateItem> allActiveItems = bizTemplateItemMapper.selectAllActiveTemplateItems();
-        
-        // Find items that need to be added
-        List<BizTemplatePriceItem> itemsToAdd = new ArrayList<>();
-        int maxSortOrder = 0;
-        for (BizTemplatePriceItem existing : existingItems)
+        if (defaultCount == 0)
         {
-            if (existing.getSortOrder() != null && existing.getSortOrder() > maxSortOrder)
-            {
-                maxSortOrder = existing.getSortOrder();
-            }
+            throw new ServiceException("Template must have one default item");
         }
         
-        for (BizTemplateItem item : allActiveItems)
+        if (defaultCount > 1)
         {
-            boolean found = false;
-            for (BizTemplatePriceItem existing : existingItems)
-            {
-                if (existing.getTemplateItemId().equals(item.getTemplateItemId()))
-                {
-                    found = true;
-                    break;
-                }
-            }
-            if (!found)
-            {
-                BizTemplatePriceItem priceItem = new BizTemplatePriceItem();
-                priceItem.setTemplatePriceId(templatePrice.getTemplatePriceId());
-                priceItem.setTemplateItemId(item.getTemplateItemId());
-                priceItem.setSortOrder(++maxSortOrder);
-                priceItem.setCreateBy(username);
-                priceItem.setCreateTime(DateUtils.getNowDate());
-                itemsToAdd.add(priceItem);
-            }
+            throw new ServiceException("Template can only have one default item");
         }
-        
-        if (!itemsToAdd.isEmpty())
-        {
-            return bizTemplatePriceItemMapper.batchInsertBizTemplatePriceItem(itemsToAdd);
-        }
-        
-        return 0;
-    }
-
-    /**
-     * Sync all templates with new template item
-     */
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public int syncAllTemplatesWithNewItem(Long templateItemId)
-    {
-        String username = SecurityUtils.getUsername();
-        
-        // Get all templates
-        BizTemplate query = new BizTemplate();
-        List<BizTemplate> templates = bizTemplateMapper.selectBizTemplateList(query);
-        
-        int totalRows = 0;
-        for (BizTemplate template : templates)
-        {
-            BizTemplatePrice templatePrice = bizTemplatePriceMapper
-                .selectBizTemplatePriceByTemplateId(template.getTemplateId());
-            
-            if (templatePrice != null)
-            {
-                // Check if item already exists
-                int exists = bizTemplatePriceItemMapper.checkTemplateItemExists(
-                    templatePrice.getTemplatePriceId(), templateItemId);
-                
-                if (exists == 0)
-                {
-                    // Get max sort order
-                    List<BizTemplatePriceItem> existingItems = bizTemplatePriceItemMapper
-                        .selectBizTemplatePriceItemByPriceId(templatePrice.getTemplatePriceId());
-                    int maxSortOrder = 0;
-                    for (BizTemplatePriceItem item : existingItems)
-                    {
-                        if (item.getSortOrder() != null && item.getSortOrder() > maxSortOrder)
-                        {
-                            maxSortOrder = item.getSortOrder();
-                        }
-                    }
-                    
-                    // Add new price item
-                    BizTemplatePriceItem priceItem = new BizTemplatePriceItem();
-                    priceItem.setTemplatePriceId(templatePrice.getTemplatePriceId());
-                    priceItem.setTemplateItemId(templateItemId);
-                    priceItem.setSortOrder(maxSortOrder + 1);
-                    priceItem.setCreateBy(username);
-                    priceItem.setCreateTime(DateUtils.getNowDate());
-                    totalRows += bizTemplatePriceItemMapper.insertBizTemplatePriceItem(priceItem);
-                }
-            }
-        }
-        
-        return totalRows;
     }
 }

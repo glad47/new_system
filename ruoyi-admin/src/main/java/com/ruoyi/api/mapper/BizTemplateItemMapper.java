@@ -1,7 +1,6 @@
 package com.ruoyi.api.mapper;
 
 import java.util.List;
-import org.apache.ibatis.annotations.Param;
 import com.ruoyi.api.domain.BizTemplateItem;
 
 /**
@@ -14,87 +13,80 @@ public interface BizTemplateItemMapper
     /**
      * Query template item by ID
      * 
-     * @param templateItemId Template item ID
-     * @return Template item
+     * @param templateItemId template item ID
+     * @return template item
      */
     public BizTemplateItem selectBizTemplateItemById(Long templateItemId);
 
     /**
-     * Query template item by ID with images
+     * Query template item by ID with price template relation
      * 
-     * @param templateItemId Template item ID
-     * @return Template item with images
+     * @param templateItemId template item ID
+     * @return template item with price template
      */
-    public BizTemplateItem selectBizTemplateItemByIdWithImages(Long templateItemId);
+    public BizTemplateItem selectBizTemplateItemByIdWithRelation(Long templateItemId);
 
     /**
-     * Query template item list
+     * Query template items by template ID
      * 
-     * @param bizTemplateItem Query conditions
-     * @return Template item list
+     * @param templateId template ID
+     * @return template item list
      */
-    public List<BizTemplateItem> selectBizTemplateItemList(BizTemplateItem bizTemplateItem);
+    public List<BizTemplateItem> selectBizTemplateItemsByTemplateId(Long templateId);
 
     /**
-     * Query template item list with image count
+     * Query template items by template ID with price template relation
      * 
-     * @param bizTemplateItem Query conditions
-     * @return Template item list with image count
+     * @param templateId template ID
+     * @return template item list with price template
      */
-    public List<BizTemplateItem> selectBizTemplateItemListWithImageCount(BizTemplateItem bizTemplateItem);
-
-    /**
-     * Query all active template items
-     * 
-     * @return All active template items
-     */
-    public List<BizTemplateItem> selectAllActiveTemplateItems();
-
-    /**
-     * Query template items by IDs
-     * 
-     * @param templateItemIds Template item IDs
-     * @return Template items
-     */
-    public List<BizTemplateItem> selectBizTemplateItemByIds(@Param("templateItemIds") List<Long> templateItemIds);
+    public List<BizTemplateItem> selectBizTemplateItemsByTemplateIdWithRelation(Long templateId);
 
     /**
      * Insert template item
      * 
-     * @param bizTemplateItem Template item
-     * @return Rows affected
+     * @param bizTemplateItem template item
+     * @return affected rows
      */
     public int insertBizTemplateItem(BizTemplateItem bizTemplateItem);
 
     /**
+     * Batch insert template items
+     * 
+     * @param templateItems template item list
+     * @return affected rows
+     */
+    public int batchInsertBizTemplateItem(List<BizTemplateItem> templateItems);
+
+    /**
      * Update template item
      * 
-     * @param bizTemplateItem Template item
-     * @return Rows affected
+     * @param bizTemplateItem template item
+     * @return affected rows
      */
     public int updateBizTemplateItem(BizTemplateItem bizTemplateItem);
 
     /**
-     * Delete template item by ID (soft delete)
+     * Delete template item by ID
      * 
-     * @param templateItemId Template item ID
-     * @return Rows affected
+     * @param templateItemId template item ID
+     * @return affected rows
      */
     public int deleteBizTemplateItemById(Long templateItemId);
 
     /**
-     * Batch delete template items (soft delete)
+     * Delete template items by template ID
      * 
-     * @param templateItemIds Template item IDs
-     * @return Rows affected
+     * @param templateId template ID
+     * @return affected rows
      */
-    public int deleteBizTemplateItemByIds(Long[] templateItemIds);
+    public int deleteBizTemplateItemsByTemplateId(Long templateId);
 
     /**
-     * Check if template item is used in any template
+     * Batch delete template items
      * 
-     * @param templateItemId Template item ID
-     * @return Count of usage
+     * @param templateItemIds template item IDs
+     * @return affected rows
      */
-    public int checkTemplateItemInUse(Long templateItemId);
+    public int deleteBizTemplateItemByIds(Long[] templateItemIds);
 }

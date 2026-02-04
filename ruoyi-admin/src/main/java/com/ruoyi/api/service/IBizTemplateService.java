@@ -13,102 +13,72 @@ public interface IBizTemplateService
     /**
      * Query template by ID
      * 
-     * @param templateId Template ID
-     * @return Template
+     * @param templateId template ID
+     * @return template
      */
     public BizTemplate selectBizTemplateById(Long templateId);
 
     /**
-     * Query template by ID with all relations
+     * Query template by ID with template items
      * 
-     * @param templateId Template ID
-     * @return Template with relations
+     * @param templateId template ID
+     * @return template with items
      */
-    public BizTemplate selectBizTemplateByIdWithRelations(Long templateId);
+    public BizTemplate selectBizTemplateByIdWithItems(Long templateId);
 
     /**
      * Query template list
      * 
-     * @param bizTemplate Query conditions
-     * @return Template list
+     * @param bizTemplate template query params
+     * @return template list
      */
     public List<BizTemplate> selectBizTemplateList(BizTemplate bizTemplate);
 
     /**
-     * Query template list with relations
+     * Query template list with template items
      * 
-     * @param bizTemplate Query conditions
-     * @return Template list with relations
+     * @param bizTemplate template query params
+     * @return template list with items
      */
-    public List<BizTemplate> selectBizTemplateListWithRelations(BizTemplate bizTemplate);
+    public List<BizTemplate> selectBizTemplateListWithItems(BizTemplate bizTemplate);
 
     /**
-     * Insert template with template price and all template items
-     * This creates:
-     * 1. biz_template record
-     * 2. biz_template_price record (with default_item_id)
-     * 3. biz_template_price_item records (for ALL active template items)
+     * Insert template with items
      * 
-     * @param bizTemplate Template
-     * @return Rows affected
+     * @param bizTemplate template with items
+     * @return affected rows
      */
     public int insertBizTemplate(BizTemplate bizTemplate);
 
     /**
-     * Update template
-     * This updates:
-     * 1. biz_template record
-     * 2. biz_template_price record (default_item_id can be changed)
-     * 3. Optionally sync template_price_items
+     * Update template with items
      * 
-     * @param bizTemplate Template
-     * @return Rows affected
+     * @param bizTemplate template with items
+     * @return affected rows
      */
     public int updateBizTemplate(BizTemplate bizTemplate);
 
     /**
      * Delete template by ID
-     * This deletes:
-     * 1. biz_template record
-     * 2. biz_template_price record (cascade)
-     * 3. biz_template_price_item records (cascade)
      * 
-     * @param templateId Template ID
-     * @return Rows affected
+     * @param templateId template ID
+     * @return affected rows
      */
     public int deleteBizTemplateById(Long templateId);
 
     /**
      * Batch delete templates
      * 
-     * @param templateIds Template IDs
-     * @return Rows affected
+     * @param templateIds template IDs
+     * @return affected rows
      */
     public int deleteBizTemplateByIds(Long[] templateIds);
 
     /**
      * Check if template name is unique
      * 
-     * @param bizTemplate Template
+     * @param bizTemplate template
      * @return true if unique
      */
     public boolean checkTemplateNameUnique(BizTemplate bizTemplate);
-
-    /**
-     * Sync template price items with all active template items
-     * Called when new template items are added
-     * 
-     * @param templateId Template ID
-     * @return Rows affected
-     */
-    public int syncTemplatePriceItems(Long templateId);
-
-    /**
-     * Sync all templates with new template item
-     * Called when a new template item is created
-     * 
-     * @param templateItemId New template item ID
-     * @return Rows affected
-     */
-    public int syncAllTemplatesWithNewItem(Long templateItemId);
 }

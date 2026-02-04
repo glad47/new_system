@@ -1,6 +1,5 @@
 package com.ruoyi.api.domain;
 
-import java.util.List;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -9,27 +8,28 @@ import com.ruoyi.common.annotation.Excel;
 import com.ruoyi.common.core.domain.BaseEntity;
 
 /**
- * Template Entity biz_template
- * Contains template items directly (one-to-many)
+ * Price Template Entity biz_price_template
+ * Simple entity - just name and size for pricing
  * 
  * @author ruoyi
  */
-public class BizTemplate extends BaseEntity
+public class BizPriceTemplate extends BaseEntity
 {
     private static final long serialVersionUID = 1L;
 
-    /** Template ID */
-    private Long templateId;
+    /** Price Template ID */
+    private Long priceTemplateId;
 
-    /** Template Name */
-    @Excel(name = "Template Name")
-    @NotBlank(message = "Template name cannot be empty")
-    @Size(min = 0, max = 200, message = "Template name cannot exceed 200 characters")
-    private String templateName;
+    /** Price Template Name */
+    @Excel(name = "Price Template Name")
+    @NotBlank(message = "Price template name cannot be empty")
+    @Size(min = 0, max = 100, message = "Price template name cannot exceed 100 characters")
+    private String priceTemplateName;
 
-    /** Template Note/Description */
-    @Excel(name = "Note")
-    private String note;
+    /** Size (e.g., S, M, L, XL or dimensions) */
+    @Excel(name = "Size")
+    @Size(min = 0, max = 50, message = "Size cannot exceed 50 characters")
+    private String size;
 
     /** Status (0=Normal, 1=Disabled) */
     @Excel(name = "Status", readConverterExp = "0=Normal,1=Disabled")
@@ -38,37 +38,34 @@ public class BizTemplate extends BaseEntity
     /** Delete Flag (0=Exist, 2=Deleted) */
     private String delFlag;
 
-    /** Template Items - direct one-to-many relationship */
-    private List<BizTemplateItem> templateItems;
-
-    public Long getTemplateId()
+    public Long getPriceTemplateId()
     {
-        return templateId;
+        return priceTemplateId;
     }
 
-    public void setTemplateId(Long templateId)
+    public void setPriceTemplateId(Long priceTemplateId)
     {
-        this.templateId = templateId;
+        this.priceTemplateId = priceTemplateId;
     }
 
-    public String getTemplateName()
+    public String getPriceTemplateName()
     {
-        return templateName;
+        return priceTemplateName;
     }
 
-    public void setTemplateName(String templateName)
+    public void setPriceTemplateName(String priceTemplateName)
     {
-        this.templateName = templateName;
+        this.priceTemplateName = priceTemplateName;
     }
 
-    public String getNote()
+    public String getSize()
     {
-        return note;
+        return size;
     }
 
-    public void setNote(String note)
+    public void setSize(String size)
     {
-        this.note = note;
+        this.size = size;
     }
 
     public String getStatus()
@@ -91,22 +88,12 @@ public class BizTemplate extends BaseEntity
         this.delFlag = delFlag;
     }
 
-    public List<BizTemplateItem> getTemplateItems()
-    {
-        return templateItems;
-    }
-
-    public void setTemplateItems(List<BizTemplateItem> templateItems)
-    {
-        this.templateItems = templateItems;
-    }
-
     @Override
     public String toString() {
         return new ToStringBuilder(this, ToStringStyle.MULTI_LINE_STYLE)
-            .append("templateId", getTemplateId())
-            .append("templateName", getTemplateName())
-            .append("note", getNote())
+            .append("priceTemplateId", getPriceTemplateId())
+            .append("priceTemplateName", getPriceTemplateName())
+            .append("size", getSize())
             .append("status", getStatus())
             .append("delFlag", getDelFlag())
             .append("createBy", getCreateBy())
