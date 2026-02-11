@@ -135,3 +135,9 @@ xss:
   excludes: /system/notice
   # 匹配链接
   urlPatterns: /system/*,/monitor/*,/tool/*
+
+minio:
+  endpoint: http://localhost:9000
+  accessKey: minioadmin
+  secretKey: minioadmin123
+  bucketName: ruoyi-bucket
