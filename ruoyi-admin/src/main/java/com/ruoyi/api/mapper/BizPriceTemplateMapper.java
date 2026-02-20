@@ -5,71 +5,63 @@ import com.ruoyi.api.domain.BizPriceTemplate;
 
 /**
  * Price Template Mapper Interface
- * 
+ *
  * @author ruoyi
  */
 public interface BizPriceTemplateMapper
 {
     /**
      * Query price template by ID
-     * 
-     * @param priceTemplateId price template ID
-     * @return price template
      */
     public BizPriceTemplate selectBizPriceTemplateById(Long priceTemplateId);
 
     /**
      * Query price template list
-     * 
-     * @param bizPriceTemplate price template query params
-     * @return price template list
      */
     public List<BizPriceTemplate> selectBizPriceTemplateList(BizPriceTemplate bizPriceTemplate);
 
     /**
      * Query all active price templates (for dropdown)
-     * 
-     * @return active price template list
      */
     public List<BizPriceTemplate> selectAllActivePriceTemplates();
 
     /**
+     * Query the current default price template
+     */
+    public BizPriceTemplate selectDefaultPriceTemplate();
+
+    /**
+     * Clear is_default = '0' on all rows (step 1 of set-default)
+     */
+    public int clearAllDefaults();
+
+    /**
+     * Set is_default = '1' on the given row (step 2 of set-default)
+     */
+    public int setDefaultById(Long priceTemplateId);
+
+    /**
      * Insert price template
-     * 
-     * @param bizPriceTemplate price template
-     * @return affected rows
      */
     public int insertBizPriceTemplate(BizPriceTemplate bizPriceTemplate);
 
     /**
      * Update price template
-     * 
-     * @param bizPriceTemplate price template
-     * @return affected rows
      */
     public int updateBizPriceTemplate(BizPriceTemplate bizPriceTemplate);
 
     /**
-     * Delete price template by ID
-     * 
-     * @param priceTemplateId price template ID
-     * @return affected rows
+     * Delete price template by ID (soft delete)
      */
     public int deleteBizPriceTemplateById(Long priceTemplateId);
 
     /**
-     * Batch delete price templates
-     * 
-     * @param priceTemplateIds price template IDs
-     * @return affected rows
+     * Batch delete price templates (soft delete)
      */
     public int deleteBizPriceTemplateByIds(Long[] priceTemplateIds);
 
     /**
      * Check if price template name is unique
-     * 
-     * @param priceTemplateName price template name
-     * @return price template info
      */
     public BizPriceTemplate checkPriceTemplateNameUnique(String priceTemplateName);
 }

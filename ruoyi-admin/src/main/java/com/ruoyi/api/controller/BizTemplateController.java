@@ -24,8 +24,7 @@ import com.ruoyi.common.utils.poi.ExcelUtil;
 
 /**
  * Template Controller
- * Manages templates with their items (each item has one image)
- * 
+ *
  * @author ruoyi
  */
 @RestController
@@ -35,9 +34,7 @@ public class BizTemplateController extends BaseController
     @Autowired
     private IBizTemplateService bizTemplateService;
 
-    /**
-     * Query template list (paginated) with items
-     */
+    /** GET /template/list — paginated list with items */
     @PreAuthorize("@ss.hasPermi('biz:template:list')")
     @GetMapping("/list")
     public TableDataInfo list(BizTemplate bizTemplate)
@@ -47,37 +44,34 @@ public class BizTemplateController extends BaseController
         return getDataTable(list);
     }
 
-    /**
-     * Export template list
-     */
+    /** GET /template/default — get the current system-default template */
+    @PreAuthorize("@ss.hasPermi('biz:template:query')")
+    @GetMapping("/default")
+    public AjaxResult getDefault()
+    {
+        return success(bizTemplateService.selectDefaultTemplate());
+    }
+
+    /** POST /template/export */
     @PreAuthorize("@ss.hasPermi('biz:template:export')")
     @Log(title = "Template", businessType = BusinessType.EXPORT)
     @PostMapping("/export")
     public void export(HttpServletResponse response, BizTemplate bizTemplate)
     {
         List<BizTemplate> list = bizTemplateService.selectBizTemplateList(bizTemplate);
-        ExcelUtil<BizTemplate> util = new ExcelUtil<BizTemplate>(BizTemplate.class);
+        ExcelUtil<BizTemplate> util = new ExcelUtil<>(BizTemplate.class);
         util.exportExcel(response, list, "Template Data");
     }
 
-    /**
-     * Get template detail with items
-     */
+    /** GET /template/{templateId} — detail with items */
     @PreAuthorize("@ss.hasPermi('biz:template:query')")
-    @GetMapping(value = "/{templateId}")
+    @GetMapping("/{templateId}")
     public AjaxResult getInfo(@PathVariable("templateId") Long templateId)
     {
         return success(bizTemplateService.selectBizTemplateByIdWithItems(templateId));
     }
 
-    /**
-     * Add template with items
-     * Request body should include templateItems array with:
-     * - priceTemplateId (optional)
-     * - itemName (optional, fallback name)
-     * - imageUrl (single image)
-     * - isDefault ('0' or '1')
-     */
+    /** POST /template — add */
     @PreAuthorize("@ss.hasPermi('biz:template:add')")
     @Log(title = "Template", businessType = BusinessType.INSERT)
     @PostMapping
@@ -86,10 +80,7 @@ public class BizTemplateController extends BaseController
         return toAjax(bizTemplateService.insertBizTemplate(bizTemplate));
     }
 
-    /**
-     * Update template with items
-     * This replaces all existing items with the new items
-     */
+    /** PUT /template — update */
     @PreAuthorize("@ss.hasPermi('biz:template:edit')")
     @Log(title = "Template", businessType = BusinessType.UPDATE)
     @PutMapping
@@ -99,8 +90,19 @@ public class BizTemplateController extends BaseController
     }
 
     /**
-     * Delete template (cascade deletes items)
+     * PUT /template/setDefault/{templateId}
+     * Atomically clears the old default and marks the new one.
      */
+    @PreAuthorize("@ss.hasPermi('biz:template:edit')")
+    @Log(title = "Template - Set Default", businessType = BusinessType.UPDATE)
+    @PutMapping("/setDefault/{templateId}")
+    public AjaxResult setDefault(@PathVariable("templateId") Long templateId)
+    {
+        bizTemplateService.setDefaultTemplate(templateId);
+        return success();
+    }
+
+    /** DELETE /template/{templateIds} — soft delete with cascade */
     @PreAuthorize("@ss.hasPermi('biz:template:remove')")
     @Log(title = "Template", businessType = BusinessType.DELETE)
     @DeleteMapping("/{templateIds}")
@@ -109,9 +111,7 @@ public class BizTemplateController extends BaseController
         return toAjax(bizTemplateService.deleteBizTemplateByIds(templateIds));
     }
 
-    /**
-     * Check template name uniqueness
-     */
+    /** GET /template/checkName */
     @PreAuthorize("@ss.hasPermi('biz:template:query')")
     @GetMapping("/checkName")
     public AjaxResult checkTemplateName(BizTemplate bizTemplate)

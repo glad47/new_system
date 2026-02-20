@@ -24,8 +24,7 @@ import com.ruoyi.common.utils.poi.ExcelUtil;
 
 /**
  * Price Template Controller
- * Simple controller for price/size definitions
- * 
+ *
  * @author ruoyi
  */
 @RestController
@@ -36,7 +35,8 @@ public class BizPriceTemplateController extends BaseController
     private IBizPriceTemplateService bizPriceTemplateService;
 
     /**
-     * Query price template list (paginated)
+     * GET /priceTemplate/list
+     * Query paginated price template list
      */
     @PreAuthorize("@ss.hasPermi('biz:priceTemplate:list')")
     @GetMapping("/list")
@@ -48,7 +48,8 @@ public class BizPriceTemplateController extends BaseController
     }
 
     /**
-     * Query all active price templates (for dropdown)
+     * GET /priceTemplate/listAll
+     * Query all active price templates (for dropdowns)
      */
     @PreAuthorize("@ss.hasPermi('biz:priceTemplate:query')")
     @GetMapping("/listAll")
@@ -59,7 +60,19 @@ public class BizPriceTemplateController extends BaseController
     }
 
     /**
-     * Export price template list
+     * GET /priceTemplate/default
+     * Get the current system-default price template
+     */
+    @PreAuthorize("@ss.hasPermi('biz:priceTemplate:query')")
+    @GetMapping("/default")
+    public AjaxResult getDefault()
+    {
+        return success(bizPriceTemplateService.selectDefaultPriceTemplate());
+    }
+
+    /**
+     * POST /priceTemplate/export
+     * Export price template list to Excel
      */
     @PreAuthorize("@ss.hasPermi('biz:priceTemplate:export')")
     @Log(title = "Price Template", businessType = BusinessType.EXPORT)
@@ -67,22 +80,24 @@ public class BizPriceTemplateController extends BaseController
     public void export(HttpServletResponse response, BizPriceTemplate bizPriceTemplate)
     {
         List<BizPriceTemplate> list = bizPriceTemplateService.selectBizPriceTemplateList(bizPriceTemplate);
-        ExcelUtil<BizPriceTemplate> util = new ExcelUtil<BizPriceTemplate>(BizPriceTemplate.class);
+        ExcelUtil<BizPriceTemplate> util = new ExcelUtil<>(BizPriceTemplate.class);
         util.exportExcel(response, list, "Price Template Data");
     }
 
     /**
-     * Get price template detail
+     * GET /priceTemplate/{priceTemplateId}
+     * Get price template detail by ID
      */
     @PreAuthorize("@ss.hasPermi('biz:priceTemplate:query')")
-    @GetMapping(value = "/{priceTemplateId}")
+    @GetMapping("/{priceTemplateId}")
     public AjaxResult getInfo(@PathVariable("priceTemplateId") Long priceTemplateId)
     {
         return success(bizPriceTemplateService.selectBizPriceTemplateById(priceTemplateId));
     }
 
     /**
-     * Add price template
+     * POST /priceTemplate
+     * Add a new price template
      */
     @PreAuthorize("@ss.hasPermi('biz:priceTemplate:add')")
     @Log(title = "Price Template", businessType = BusinessType.INSERT)
@@ -93,7 +108,8 @@ public class BizPriceTemplateController extends BaseController
     }
 
     /**
-     * Update price template
+     * PUT /priceTemplate
+     * Update an existing price template
      */
     @PreAuthorize("@ss.hasPermi('biz:priceTemplate:edit')")
     @Log(title = "Price Template", businessType = BusinessType.UPDATE)
@@ -104,7 +120,22 @@ public class BizPriceTemplateController extends BaseController
     }
 
     /**
-     * Delete price template
+     * PUT /priceTemplate/setDefault/{priceTemplateId}
+     * Set the given price template as the system default.
+     * Atomically clears the old default and sets the new one.
+     */
+    @PreAuthorize("@ss.hasPermi('biz:priceTemplate:edit')")
+    @Log(title = "Price Template - Set Default", businessType = BusinessType.UPDATE)
+    @PutMapping("/setDefault/{priceTemplateId}")
+    public AjaxResult setDefault(@PathVariable("priceTemplateId") Long priceTemplateId)
+    {
+        bizPriceTemplateService.setDefaultPriceTemplate(priceTemplateId);
+        return success();
+    }
+
+    /**
+     * DELETE /priceTemplate/{priceTemplateIds}
+     * Soft-delete one or more price templates
      */
     @PreAuthorize("@ss.hasPermi('biz:priceTemplate:remove')")
     @Log(title = "Price Template", businessType = BusinessType.DELETE)

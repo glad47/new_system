@@ -35,6 +35,19 @@ public class BizPriceTemplate extends BaseEntity
     @Excel(name = "Status", readConverterExp = "0=Normal,1=Disabled")
     private String status;
 
+    public String getIsDefault() {
+        return isDefault;
+    }
+
+    public void setIsDefault(String isDefault) {
+        this.isDefault = isDefault;
+    }
+
+    /** Status (0=Normal, 1=Disabled) */
+    @Excel(name = "isDefault", readConverterExp = "0=No,1=Yes")
+    private String isDefault;
+
+
     /** Delete Flag (0=Exist, 2=Deleted) */
     private String delFlag;
 

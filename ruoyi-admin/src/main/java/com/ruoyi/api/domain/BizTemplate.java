@@ -10,8 +10,7 @@ import com.ruoyi.common.core.domain.BaseEntity;
 
 /**
  * Template Entity biz_template
- * Contains template items directly (one-to-many)
- * 
+ *
  * @author ruoyi
  */
 public class BizTemplate extends BaseEntity
@@ -35,85 +34,51 @@ public class BizTemplate extends BaseEntity
     @Excel(name = "Status", readConverterExp = "0=Normal,1=Disabled")
     private String status;
 
+    /** Is Default Template (0=No, 1=Yes) */
+    @Excel(name = "Is Default", readConverterExp = "0=No,1=Yes")
+    private String isDefault;
+
     /** Delete Flag (0=Exist, 2=Deleted) */
     private String delFlag;
 
-    /** Template Items - direct one-to-many relationship */
+    /** Template Items - one-to-many */
     private List<BizTemplateItem> templateItems;
 
-    public Long getTemplateId()
-    {
-        return templateId;
-    }
+    public Long getTemplateId() { return templateId; }
+    public void setTemplateId(Long templateId) { this.templateId = templateId; }
 
-    public void setTemplateId(Long templateId)
-    {
-        this.templateId = templateId;
-    }
+    public String getTemplateName() { return templateName; }
+    public void setTemplateName(String templateName) { this.templateName = templateName; }
 
-    public String getTemplateName()
-    {
-        return templateName;
-    }
+    public String getNote() { return note; }
+    public void setNote(String note) { this.note = note; }
 
-    public void setTemplateName(String templateName)
-    {
-        this.templateName = templateName;
-    }
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
 
-    public String getNote()
-    {
-        return note;
-    }
+    public String getIsDefault() { return isDefault; }
+    public void setIsDefault(String isDefault) { this.isDefault = isDefault; }
 
-    public void setNote(String note)
-    {
-        this.note = note;
-    }
+    public String getDelFlag() { return delFlag; }
+    public void setDelFlag(String delFlag) { this.delFlag = delFlag; }
 
-    public String getStatus()
-    {
-        return status;
-    }
-
-    public void setStatus(String status)
-    {
-        this.status = status;
-    }
-
-    public String getDelFlag()
-    {
-        return delFlag;
-    }
-
-    public void setDelFlag(String delFlag)
-    {
-        this.delFlag = delFlag;
-    }
-
-    public List<BizTemplateItem> getTemplateItems()
-    {
-        return templateItems;
-    }
-
-    public void setTemplateItems(List<BizTemplateItem> templateItems)
-    {
-        this.templateItems = templateItems;
-    }
+    public List<BizTemplateItem> getTemplateItems() { return templateItems; }
+    public void setTemplateItems(List<BizTemplateItem> templateItems) { this.templateItems = templateItems; }
 
     @Override
     public String toString() {
         return new ToStringBuilder(this, ToStringStyle.MULTI_LINE_STYLE)
-            .append("templateId", getTemplateId())
-            .append("templateName", getTemplateName())
-            .append("note", getNote())
-            .append("status", getStatus())
-            .append("delFlag", getDelFlag())
-            .append("createBy", getCreateBy())
-            .append("createTime", getCreateTime())
-            .append("updateBy", getUpdateBy())
-            .append("updateTime", getUpdateTime())
-            .append("remark", getRemark())
-            .toString();
+                .append("templateId", getTemplateId())
+                .append("templateName", getTemplateName())
+                .append("note", getNote())
+                .append("status", getStatus())
+                .append("isDefault", getIsDefault())
+                .append("delFlag", getDelFlag())
+                .append("createBy", getCreateBy())
+                .append("createTime", getCreateTime())
+                .append("updateBy", getUpdateBy())
+                .append("updateTime", getUpdateTime())
+                .append("remark", getRemark())
+                .toString();
     }
 }
