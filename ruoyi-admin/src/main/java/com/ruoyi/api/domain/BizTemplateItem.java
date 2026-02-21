@@ -49,6 +49,13 @@ public class BizTemplateItem extends BaseEntity
     /** Image Size (bytes) */
     private Long imageSize;
 
+    /**
+     * Image field annotations - stored as JSON string in DB.
+     * Contains normalized (0-1) coordinates for each field position on the image.
+     * Example: {"productName":{"fieldKey":"productName","label":"Product Name","x":0.05,"y":0.08,"width":0.9,"height":0.15},...}
+     */
+    private String imageAnnotations;
+
     /** Is Default Item (0=No, 1=Yes) */
     @Excel(name = "Is Default", readConverterExp = "0=No,1=Yes")
     private String isDefault;
@@ -153,6 +160,16 @@ public class BizTemplateItem extends BaseEntity
         this.imageSize = imageSize;
     }
 
+    public String getImageAnnotations()
+    {
+        return imageAnnotations;
+    }
+
+    public void setImageAnnotations(String imageAnnotations)
+    {
+        this.imageAnnotations = imageAnnotations;
+    }
+
     public String getIsDefault()
     {
         return isDefault;
@@ -201,6 +218,7 @@ public class BizTemplateItem extends BaseEntity
             .append("priceTemplateId", getPriceTemplateId())
             .append("itemName", getItemName())
             .append("imageUrl", getImageUrl())
+            .append("imageAnnotations", getImageAnnotations())
             .append("isDefault", getIsDefault())
             .append("sortOrder", getSortOrder())
             .append("status", getStatus())
