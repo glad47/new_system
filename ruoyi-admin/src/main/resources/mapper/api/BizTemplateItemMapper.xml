@@ -14,6 +14,20 @@
         <result property="imageType"          column="image_type"           />
         <result property="imageSize"          column="image_size"           />
         <result property="imageAnnotations"   column="image_annotations"    />
+        <result property="priceAfterIntegerFontSize"  column="price_after_integer_font_size"  />
+        <result property="priceAfterDecimalFontSize"  column="price_after_decimal_font_size"  />
+        <result property="priceBeforeIntegerFontSize" column="price_before_integer_font_size" />
+        <result property="priceBeforeDecimalFontSize" column="price_before_decimal_font_size" />
+        <result property="fontProductName"    column="font_product_name"    />
+        <result property="fontBarcode"        column="font_barcode"         />
+        <result property="fontQuantity"       column="font_quantity"        />
+        <result property="fontPerCustomer"    column="font_per_customer"    />
+        <result property="colorProductName"   column="color_product_name"   />
+        <result property="colorPriceAfter"    column="color_price_after"    />
+        <result property="colorPriceBefore"   column="color_price_before"   />
+        <result property="colorBarcode"       column="color_barcode"        />
+        <result property="colorQuantity"      column="color_quantity"       />
+        <result property="colorPerCustomer"   column="color_per_customer"   />
         <result property="isDefault"          column="is_default"           />
         <result property="sortOrder"          column="sort_order"           />
         <result property="status"             column="status"               />
@@ -40,6 +54,11 @@
     <sql id="selectBizTemplateItemVo">
         select template_item_id, template_id, price_template_id, item_name,
         image_url, image_name, image_type, image_size, image_annotations,
+        price_after_integer_font_size, price_after_decimal_font_size,
+        price_before_integer_font_size, price_before_decimal_font_size,
+        font_product_name, font_barcode, font_quantity, font_per_customer,
+        color_product_name, color_price_after, color_price_before,
+        color_barcode, color_quantity, color_per_customer,
         is_default, sort_order, status, del_flag,
         create_by, create_time, update_by, update_time, remark
         from biz_template_item
@@ -48,6 +67,11 @@
     <sql id="selectBizTemplateItemWithPriceTemplateVo">
         select ti.template_item_id, ti.template_id, ti.price_template_id, ti.item_name,
         ti.image_url, ti.image_name, ti.image_type, ti.image_size, ti.image_annotations,
+        ti.price_after_integer_font_size, ti.price_after_decimal_font_size,
+        ti.price_before_integer_font_size, ti.price_before_decimal_font_size,
+        ti.font_product_name, ti.font_barcode, ti.font_quantity, ti.font_per_customer,
+        ti.color_product_name, ti.color_price_after, ti.color_price_before,
+        ti.color_barcode, ti.color_quantity, ti.color_per_customer,
         ti.is_default, ti.sort_order, ti.status, ti.del_flag,
         ti.create_by, ti.create_time, ti.update_by, ti.update_time, ti.remark,
         pt.price_template_id as pt_price_template_id,
@@ -94,6 +118,20 @@
             <if test="imageType != null">image_type,</if>
             <if test="imageSize != null">image_size,</if>
             <if test="imageAnnotations != null">image_annotations,</if>
+            <if test="priceAfterIntegerFontSize != null">price_after_integer_font_size,</if>
+            <if test="priceAfterDecimalFontSize != null">price_after_decimal_font_size,</if>
+            <if test="priceBeforeIntegerFontSize != null">price_before_integer_font_size,</if>
+            <if test="priceBeforeDecimalFontSize != null">price_before_decimal_font_size,</if>
+            <if test="fontProductName != null">font_product_name,</if>
+            <if test="fontBarcode != null">font_barcode,</if>
+            <if test="fontQuantity != null">font_quantity,</if>
+            <if test="fontPerCustomer != null">font_per_customer,</if>
+            <if test="colorProductName != null">color_product_name,</if>
+            <if test="colorPriceAfter != null">color_price_after,</if>
+            <if test="colorPriceBefore != null">color_price_before,</if>
+            <if test="colorBarcode != null">color_barcode,</if>
+            <if test="colorQuantity != null">color_quantity,</if>
+            <if test="colorPerCustomer != null">color_per_customer,</if>
             <if test="isDefault != null">is_default,</if>
             <if test="sortOrder != null">sort_order,</if>
             <if test="status != null">status,</if>
@@ -111,6 +149,20 @@
             <if test="imageType != null">#{imageType},</if>
             <if test="imageSize != null">#{imageSize},</if>
             <if test="imageAnnotations != null">#{imageAnnotations},</if>
+            <if test="priceAfterIntegerFontSize != null">#{priceAfterIntegerFontSize},</if>
+            <if test="priceAfterDecimalFontSize != null">#{priceAfterDecimalFontSize},</if>
+            <if test="priceBeforeIntegerFontSize != null">#{priceBeforeIntegerFontSize},</if>
+            <if test="priceBeforeDecimalFontSize != null">#{priceBeforeDecimalFontSize},</if>
+            <if test="fontProductName != null">#{fontProductName},</if>
+            <if test="fontBarcode != null">#{fontBarcode},</if>
+            <if test="fontQuantity != null">#{fontQuantity},</if>
+            <if test="fontPerCustomer != null">#{fontPerCustomer},</if>
+            <if test="colorProductName != null">#{colorProductName},</if>
+            <if test="colorPriceAfter != null">#{colorPriceAfter},</if>
+            <if test="colorPriceBefore != null">#{colorPriceBefore},</if>
+            <if test="colorBarcode != null">#{colorBarcode},</if>
+            <if test="colorQuantity != null">#{colorQuantity},</if>
+            <if test="colorPerCustomer != null">#{colorPerCustomer},</if>
             <if test="isDefault != null">#{isDefault},</if>
             <if test="sortOrder != null">#{sortOrder},</if>
             <if test="status != null">#{status},</if>
@@ -125,6 +177,11 @@
         insert into biz_template_item (
         template_id, price_template_id, item_name,
         image_url, image_name, image_type, image_size, image_annotations,
+        price_after_integer_font_size, price_after_decimal_font_size,
+        price_before_integer_font_size, price_before_decimal_font_size,
+        font_product_name, font_barcode, font_quantity, font_per_customer,
+        color_product_name, color_price_after, color_price_before,
+        color_barcode, color_quantity, color_per_customer,
         is_default, sort_order, status, del_flag,
         create_by, create_time, remark
         ) values
@@ -138,6 +195,20 @@
             #{item.imageType},
             #{item.imageSize},
             #{item.imageAnnotations},
+            #{item.priceAfterIntegerFontSize},
+            #{item.priceAfterDecimalFontSize},
+            #{item.priceBeforeIntegerFontSize},
+            #{item.priceBeforeDecimalFontSize},
+            #{item.fontProductName},
+            #{item.fontBarcode},
+            #{item.fontQuantity},
+            #{item.fontPerCustomer},
+            #{item.colorProductName},
+            #{item.colorPriceAfter},
+            #{item.colorPriceBefore},
+            #{item.colorBarcode},
+            #{item.colorQuantity},
+            #{item.colorPerCustomer},
             #{item.isDefault},
             #{item.sortOrder},
             '0',
@@ -160,6 +231,20 @@
             <if test="imageType != null">image_type = #{imageType},</if>
             <if test="imageSize != null">image_size = #{imageSize},</if>
             <if test="imageAnnotations != null">image_annotations = #{imageAnnotations},</if>
+            <if test="priceAfterIntegerFontSize != null">price_after_integer_font_size = #{priceAfterIntegerFontSize},</if>
+            <if test="priceAfterDecimalFontSize != null">price_after_decimal_font_size = #{priceAfterDecimalFontSize},</if>
+            <if test="priceBeforeIntegerFontSize != null">price_before_integer_font_size = #{priceBeforeIntegerFontSize},</if>
+            <if test="priceBeforeDecimalFontSize != null">price_before_decimal_font_size = #{priceBeforeDecimalFontSize},</if>
+            <if test="fontProductName != null">font_product_name = #{fontProductName},</if>
+            <if test="fontBarcode != null">font_barcode = #{fontBarcode},</if>
+            <if test="fontQuantity != null">font_quantity = #{fontQuantity},</if>
+            <if test="fontPerCustomer != null">font_per_customer = #{fontPerCustomer},</if>
+            <if test="colorProductName != null">color_product_name = #{colorProductName},</if>
+            <if test="colorPriceAfter != null">color_price_after = #{colorPriceAfter},</if>
+            <if test="colorPriceBefore != null">color_price_before = #{colorPriceBefore},</if>
+            <if test="colorBarcode != null">color_barcode = #{colorBarcode},</if>
+            <if test="colorQuantity != null">color_quantity = #{colorQuantity},</if>
+            <if test="colorPerCustomer != null">color_per_customer = #{colorPerCustomer},</if>
             <if test="isDefault != null">is_default = #{isDefault},</if>
             <if test="sortOrder != null">sort_order = #{sortOrder},</if>
             <if test="status != null">status = #{status},</if>

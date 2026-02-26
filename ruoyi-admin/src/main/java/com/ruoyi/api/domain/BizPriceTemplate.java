@@ -13,8 +13,8 @@ import java.math.BigDecimal;
 
 /**
  * Price Template Entity  biz_price_template
- * All font-size settings for every field on a price tag are stored here.
- * During printing, font values are retrieved by joining through price_template_id.
+ * Defines the physical size (mm), name, and status of a price tag template.
+ * Font size and color settings have been moved to BizTemplateItem.
  *
  * @author ruoyi
  */
@@ -58,41 +58,6 @@ public class BizPriceTemplate extends BaseEntity
 
     /** Delete Flag (0=Exist, 2=Deleted) */
     private String delFlag;
-
-    // ── NEW price font sizes (السعر الجديد / price after) ───────────────────
-    /** Font size (pt) for digits LEFT  of decimal in the NEW price  e.g. "5"   in "5.80" */
-    @Excel(name = "New Price Integer Font Size (pt)")
-    private Integer priceAfterIntegerFontSize;
-
-    /** Font size (pt) for digits RIGHT of decimal in the NEW price  e.g. ".80" in "5.80" */
-    @Excel(name = "New Price Decimal Font Size (pt)")
-    private Integer priceAfterDecimalFontSize;
-
-    // ── OLD price font sizes (السعر القديم / price before) ──────────────────
-    /** Font size (pt) for digits LEFT  of decimal in the OLD price  e.g. "8"   in "8.80" */
-    @Excel(name = "Old Price Integer Font Size (pt)")
-    private Integer priceBeforeIntegerFontSize;
-
-    /** Font size (pt) for digits RIGHT of decimal in the OLD price  e.g. ".80" in "8.80" */
-    @Excel(name = "Old Price Decimal Font Size (pt)")
-    private Integer priceBeforeDecimalFontSize;
-
-    // ── Other field font sizes ────────────────────────────────────────────────
-    /** Font size (pt) for the product name */
-    @Excel(name = "Product Name Font Size (pt)")
-    private Integer fontProductName;
-
-    /** Font size (pt) for the barcode */
-    @Excel(name = "Barcode Font Size (pt)")
-    private Integer fontBarcode;
-
-    /** Font size (pt) for the quantity field */
-    @Excel(name = "Quantity Font Size (pt)")
-    private Integer fontQuantity;
-
-    /** Font size (pt) for the per-customer limit field */
-    @Excel(name = "Per-Customer Font Size (pt)")
-    private Integer fontPerCustomer;
 
     // ── Product name override / truncation ───────────────────────────────────
     /**
@@ -138,32 +103,6 @@ public class BizPriceTemplate extends BaseEntity
     public String getDelFlag() { return delFlag; }
     public void setDelFlag(String delFlag) { this.delFlag = delFlag; }
 
-    public Integer getPriceAfterIntegerFontSize() { return priceAfterIntegerFontSize; }
-    public void setPriceAfterIntegerFontSize(Integer v) { this.priceAfterIntegerFontSize = v; }
-
-    public Integer getPriceAfterDecimalFontSize() { return priceAfterDecimalFontSize; }
-    public void setPriceAfterDecimalFontSize(Integer v) { this.priceAfterDecimalFontSize = v; }
-
-    public Integer getPriceBeforeIntegerFontSize() { return priceBeforeIntegerFontSize; }
-    public void setPriceBeforeIntegerFontSize(Integer v) { this.priceBeforeIntegerFontSize = v; }
-
-    public Integer getPriceBeforeDecimalFontSize() { return priceBeforeDecimalFontSize; }
-    public void setPriceBeforeDecimalFontSize(Integer v) { this.priceBeforeDecimalFontSize = v; }
-
-    public Integer getFontProductName() { return fontProductName; }
-    public void setFontProductName(Integer fontProductName) { this.fontProductName = fontProductName; }
-
-
-
-    public Integer getFontBarcode() { return fontBarcode; }
-    public void setFontBarcode(Integer fontBarcode) { this.fontBarcode = fontBarcode; }
-
-    public Integer getFontQuantity() { return fontQuantity; }
-    public void setFontQuantity(Integer fontQuantity) { this.fontQuantity = fontQuantity; }
-
-    public Integer getFontPerCustomer() { return fontPerCustomer; }
-    public void setFontPerCustomer(Integer fontPerCustomer) { this.fontPerCustomer = fontPerCustomer; }
-
     public String getProductNameOverride() { return productNameOverride; }
     public void setProductNameOverride(String productNameOverride) { this.productNameOverride = productNameOverride; }
 
@@ -182,15 +121,6 @@ public class BizPriceTemplate extends BaseEntity
                 .append("status",                getStatus())
                 .append("isDefault",             getIsDefault())
                 .append("delFlag",               getDelFlag())
-                .append("priceAfterIntegerFontSize",  getPriceAfterIntegerFontSize())
-                .append("priceAfterDecimalFontSize",  getPriceAfterDecimalFontSize())
-                .append("priceBeforeIntegerFontSize", getPriceBeforeIntegerFontSize())
-                .append("priceBeforeDecimalFontSize", getPriceBeforeDecimalFontSize())
-                .append("fontProductName",       getFontProductName())
-
-                .append("fontBarcode",           getFontBarcode())
-                .append("fontQuantity",          getFontQuantity())
-                .append("fontPerCustomer",       getFontPerCustomer())
                 .append("productNameOverride",   getProductNameOverride())
                 .append("nameMaxChars",          getNameMaxChars())
                 .append("createBy",              getCreateBy())

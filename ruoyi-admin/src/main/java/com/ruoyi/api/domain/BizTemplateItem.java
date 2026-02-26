@@ -56,6 +56,50 @@ public class BizTemplateItem extends BaseEntity
      */
     private String imageAnnotations;
 
+    // ── Font sizes (pt) stored per template item ──────────────────────────────
+    /** Font size (pt) for digits LEFT  of decimal in the NEW price  e.g. "5"   in "5.80" */
+    private Integer priceAfterIntegerFontSize;
+
+    /** Font size (pt) for digits RIGHT of decimal in the NEW price  e.g. ".80" in "5.80" */
+    private Integer priceAfterDecimalFontSize;
+
+    /** Font size (pt) for digits LEFT  of decimal in the OLD price  e.g. "8"   in "8.80" */
+    private Integer priceBeforeIntegerFontSize;
+
+    /** Font size (pt) for digits RIGHT of decimal in the OLD price  e.g. ".80" in "8.80" */
+    private Integer priceBeforeDecimalFontSize;
+
+    /** Font size (pt) for the product name */
+    private Integer fontProductName;
+
+    /** Font size (pt) for the barcode */
+    private Integer fontBarcode;
+
+    /** Font size (pt) for the quantity field */
+    private Integer fontQuantity;
+
+    /** Font size (pt) for the per-customer limit field */
+    private Integer fontPerCustomer;
+
+    // ── Font colors (CSS hex e.g. #ffffff) stored per template item ───────────
+    /** Font color for the product name */
+    private String colorProductName;
+
+    /** Font color for the new price (priceAfter) */
+    private String colorPriceAfter;
+
+    /** Font color for the old price (priceBefore) */
+    private String colorPriceBefore;
+
+    /** Font color for the barcode */
+    private String colorBarcode;
+
+    /** Font color for the quantity field */
+    private String colorQuantity;
+
+    /** Font color for the per-customer field */
+    private String colorPerCustomer;
+
     /** Is Default Item (0=No, 1=Yes) */
     @Excel(name = "Is Default", readConverterExp = "0=No,1=Yes")
     private String isDefault;
@@ -209,6 +253,48 @@ public class BizTemplateItem extends BaseEntity
     {
         this.delFlag = delFlag;
     }
+
+    public Integer getPriceAfterIntegerFontSize() { return priceAfterIntegerFontSize; }
+    public void setPriceAfterIntegerFontSize(Integer v) { this.priceAfterIntegerFontSize = v; }
+
+    public Integer getPriceAfterDecimalFontSize() { return priceAfterDecimalFontSize; }
+    public void setPriceAfterDecimalFontSize(Integer v) { this.priceAfterDecimalFontSize = v; }
+
+    public Integer getPriceBeforeIntegerFontSize() { return priceBeforeIntegerFontSize; }
+    public void setPriceBeforeIntegerFontSize(Integer v) { this.priceBeforeIntegerFontSize = v; }
+
+    public Integer getPriceBeforeDecimalFontSize() { return priceBeforeDecimalFontSize; }
+    public void setPriceBeforeDecimalFontSize(Integer v) { this.priceBeforeDecimalFontSize = v; }
+
+    public Integer getFontProductName() { return fontProductName; }
+    public void setFontProductName(Integer v) { this.fontProductName = v; }
+
+    public Integer getFontBarcode() { return fontBarcode; }
+    public void setFontBarcode(Integer v) { this.fontBarcode = v; }
+
+    public Integer getFontQuantity() { return fontQuantity; }
+    public void setFontQuantity(Integer v) { this.fontQuantity = v; }
+
+    public Integer getFontPerCustomer() { return fontPerCustomer; }
+    public void setFontPerCustomer(Integer v) { this.fontPerCustomer = v; }
+
+    public String getColorProductName() { return colorProductName; }
+    public void setColorProductName(String v) { this.colorProductName = v; }
+
+    public String getColorPriceAfter() { return colorPriceAfter; }
+    public void setColorPriceAfter(String v) { this.colorPriceAfter = v; }
+
+    public String getColorPriceBefore() { return colorPriceBefore; }
+    public void setColorPriceBefore(String v) { this.colorPriceBefore = v; }
+
+    public String getColorBarcode() { return colorBarcode; }
+    public void setColorBarcode(String v) { this.colorBarcode = v; }
+
+    public String getColorQuantity() { return colorQuantity; }
+    public void setColorQuantity(String v) { this.colorQuantity = v; }
+
+    public String getColorPerCustomer() { return colorPerCustomer; }
+    public void setColorPerCustomer(String v) { this.colorPerCustomer = v; }
 
     @Override
     public String toString() {

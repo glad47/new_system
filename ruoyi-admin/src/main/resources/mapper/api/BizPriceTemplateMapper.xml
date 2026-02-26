@@ -5,44 +5,26 @@
 <mapper namespace="com.ruoyi.api.mapper.BizPriceTemplateMapper">
 
     <resultMap type="com.ruoyi.api.domain.BizPriceTemplate" id="BizPriceTemplateResult">
-        <id     property="priceTemplateId"       column="price_template_id"       />
-        <result property="priceTemplateName"     column="price_template_name"     />
-        <result property="size"                  column="size"                    />
-        <result property="widthMm"               column="width_mm"                />
-        <result property="heightMm"              column="height_mm"               />
-        <result property="status"                column="status"                  />
-        <result property="isDefault"             column="is_default"              />
-        <result property="delFlag"               column="del_flag"                />
-        <!-- Font sizes — single source of truth for printing -->
-        <!-- NEW price font sizes (السعر الجديد) -->
-        <result property="priceAfterIntegerFontSize"  column="price_after_integer_font_size"  />
-        <result property="priceAfterDecimalFontSize"  column="price_after_decimal_font_size"  />
-        <!-- OLD price font sizes (السعر القديم) -->
-        <result property="priceBeforeIntegerFontSize" column="price_before_integer_font_size" />
-        <result property="priceBeforeDecimalFontSize" column="price_before_decimal_font_size" />
-        <result property="fontProductName"       column="font_product_name"       />
-
-        <result property="fontBarcode"           column="font_barcode"            />
-        <result property="fontQuantity"          column="font_quantity"           />
-        <result property="fontPerCustomer"       column="font_per_customer"       />
-        <!-- Name override / truncation -->
-        <result property="productNameOverride"   column="product_name_override"   />
-        <result property="nameMaxChars"          column="name_max_chars"          />
-        <!-- Audit -->
-        <result property="createBy"              column="create_by"               />
-        <result property="createTime"            column="create_time"             />
-        <result property="updateBy"              column="update_by"               />
-        <result property="updateTime"            column="update_time"             />
-        <result property="remark"                column="remark"                  />
+        <id     property="priceTemplateId"    column="price_template_id"    />
+        <result property="priceTemplateName"  column="price_template_name"  />
+        <result property="size"               column="size"                 />
+        <result property="widthMm"            column="width_mm"             />
+        <result property="heightMm"           column="height_mm"            />
+        <result property="status"             column="status"               />
+        <result property="isDefault"          column="is_default"           />
+        <result property="delFlag"            column="del_flag"             />
+        <result property="productNameOverride" column="product_name_override" />
+        <result property="nameMaxChars"       column="name_max_chars"       />
+        <result property="createBy"           column="create_by"            />
+        <result property="createTime"         column="create_time"          />
+        <result property="updateBy"           column="update_by"            />
+        <result property="updateTime"         column="update_time"          />
+        <result property="remark"             column="remark"               />
     </resultMap>
 
     <sql id="selectBizPriceTemplateVo">
-        select price_template_id, price_template_name, size,
-               width_mm, height_mm, status, is_default, del_flag,
-               price_after_integer_font_size, price_after_decimal_font_size,
-               price_before_integer_font_size, price_before_decimal_font_size,
-               font_product_name,
-               font_barcode, font_quantity, font_per_customer,
+        select price_template_id, price_template_name, size, width_mm, height_mm,
+               status, is_default, del_flag,
                product_name_override, name_max_chars,
                create_by, create_time, update_by, update_time, remark
         from biz_price_template
@@ -53,22 +35,12 @@
         <where>
             del_flag = '0'
             <if test="priceTemplateName != null and priceTemplateName != ''">
-                AND price_template_name like concat('%', #{priceTemplateName}, '%')
+                AND price_template_name LIKE CONCAT('%', #{priceTemplateName}, '%')
             </if>
-            <if test="size != null and size != ''">
-                AND size like concat('%', #{size}, '%')
-            </if>
-            <if test="status != null and status != ''">
-                AND status = #{status}
-            </if>
+            <if test="size != null and size != ''">AND size = #{size}</if>
+            <if test="status != null and status != ''">AND status = #{status}</if>
         </where>
-        order by is_default desc, create_time desc
-    </select>
-
-    <select id="selectAllActivePriceTemplates" resultMap="BizPriceTemplateResult">
-        <include refid="selectBizPriceTemplateVo"/>
-        where del_flag = '0' and status = '0'
-        order by is_default desc, price_template_name
+        ORDER BY price_template_id ASC
     </select>
 
     <select id="selectBizPriceTemplateById" parameterType="Long" resultMap="BizPriceTemplateResult">
@@ -76,20 +48,13 @@
         where price_template_id = #{priceTemplateId} and del_flag = '0'
     </select>
 
-    <select id="selectDefaultPriceTemplate" resultMap="BizPriceTemplateResult">
+    <select id="selectAllBizPriceTemplates" resultMap="BizPriceTemplateResult">
         <include refid="selectBizPriceTemplateVo"/>
-        where del_flag = '0' and is_default = '1'
-        limit 1
+        where del_flag = '0'
+        order by price_template_id asc
     </select>
 
-    <select id="checkPriceTemplateNameUnique" parameterType="String" resultMap="BizPriceTemplateResult">
-        select price_template_id, price_template_name from biz_price_template
-        where price_template_name = #{priceTemplateName} and del_flag = '0'
-        limit 1
-    </select>
-
-    <insert id="insertBizPriceTemplate" parameterType="com.ruoyi.api.domain.BizPriceTemplate"
-            useGeneratedKeys="true" keyProperty="priceTemplateId">
+    <insert id="insertBizPriceTemplate" parameterType="com.ruoyi.api.domain.BizPriceTemplate" useGeneratedKeys="true" keyProperty="priceTemplateId">
         insert into biz_price_template
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="priceTemplateName != null and priceTemplateName != ''">price_template_name,</if>
@@ -97,23 +62,12 @@
             <if test="widthMm != null">width_mm,</if>
             <if test="heightMm != null">height_mm,</if>
             <if test="status != null">status,</if>
-            <if test="delFlag != null">del_flag,</if>
-            is_default,
-            <if test="priceAfterIntegerFontSize != null">price_after_integer_font_size,</if>
-            <if test="priceAfterDecimalFontSize != null">price_after_decimal_font_size,</if>
-            <if test="priceBeforeIntegerFontSize != null">price_before_integer_font_size,</if>
-            <if test="priceBeforeDecimalFontSize != null">price_before_decimal_font_size,</if>
-            <if test="fontProductName != null">font_product_name,</if>
-
-            <if test="fontBarcode != null">font_barcode,</if>
-            <if test="fontQuantity != null">font_quantity,</if>
-            <if test="fontPerCustomer != null">font_per_customer,</if>
+            <if test="isDefault != null">is_default,</if>
             <if test="productNameOverride != null">product_name_override,</if>
             <if test="nameMaxChars != null">name_max_chars,</if>
+            del_flag,
             <if test="createBy != null">create_by,</if>
             <if test="createTime != null">create_time,</if>
-            <if test="updateBy != null">update_by,</if>
-            <if test="updateTime != null">update_time,</if>
             <if test="remark != null">remark,</if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
@@ -122,66 +76,32 @@
             <if test="widthMm != null">#{widthMm},</if>
             <if test="heightMm != null">#{heightMm},</if>
             <if test="status != null">#{status},</if>
-            <if test="delFlag != null">#{delFlag},</if>
-            <choose>
-                <when test="isDefault != null">#{isDefault},</when>
-                <otherwise>'0',</otherwise>
-            </choose>
-            <if test="priceAfterIntegerFontSize != null">#{priceAfterIntegerFontSize},</if>
-            <if test="priceAfterDecimalFontSize != null">#{priceAfterDecimalFontSize},</if>
-            <if test="priceBeforeIntegerFontSize != null">#{priceBeforeIntegerFontSize},</if>
-            <if test="priceBeforeDecimalFontSize != null">#{priceBeforeDecimalFontSize},</if>
-            <if test="fontProductName != null">#{fontProductName},</if>
-
-            <if test="fontBarcode != null">#{fontBarcode},</if>
-            <if test="fontQuantity != null">#{fontQuantity},</if>
-            <if test="fontPerCustomer != null">#{fontPerCustomer},</if>
+            <if test="isDefault != null">#{isDefault},</if>
             <if test="productNameOverride != null">#{productNameOverride},</if>
             <if test="nameMaxChars != null">#{nameMaxChars},</if>
+            '0',
             <if test="createBy != null">#{createBy},</if>
             <if test="createTime != null">#{createTime},</if>
-            <if test="updateBy != null">#{updateBy},</if>
-            <if test="updateTime != null">#{updateTime},</if>
             <if test="remark != null">#{remark},</if>
         </trim>
     </insert>
 
-    <!-- UPDATE — NULL values intentionally clear the column -->
     <update id="updateBizPriceTemplate" parameterType="com.ruoyi.api.domain.BizPriceTemplate">
         update biz_price_template
         <trim prefix="SET" suffixOverrides=",">
             <if test="priceTemplateName != null and priceTemplateName != ''">price_template_name = #{priceTemplateName},</if>
             <if test="size != null">size = #{size},</if>
-            width_mm                = #{widthMm},
-            height_mm               = #{heightMm},
+            <if test="widthMm != null">width_mm = #{widthMm},</if>
+            <if test="heightMm != null">height_mm = #{heightMm},</if>
             <if test="status != null">status = #{status},</if>
             <if test="isDefault != null">is_default = #{isDefault},</if>
-            price_after_integer_font_size  = #{priceAfterIntegerFontSize},
-            price_after_decimal_font_size  = #{priceAfterDecimalFontSize},
-            price_before_integer_font_size = #{priceBeforeIntegerFontSize},
-            price_before_decimal_font_size = #{priceBeforeDecimalFontSize},
-            font_product_name       = #{fontProductName},
-
-            font_barcode            = #{fontBarcode},
-            font_quantity           = #{fontQuantity},
-            font_per_customer       = #{fontPerCustomer},
-            product_name_override   = #{productNameOverride},
-            name_max_chars          = #{nameMaxChars},
+            product_name_override = #{productNameOverride},
+            name_max_chars = #{nameMaxChars},
             <if test="updateBy != null">update_by = #{updateBy},</if>
             <if test="updateTime != null">update_time = #{updateTime},</if>
             <if test="remark != null">remark = #{remark},</if>
         </trim>
         where price_template_id = #{priceTemplateId}
-    </update>
-
-    <update id="clearAllDefaults">
-        update biz_price_template set is_default = '0'
-        where del_flag = '0' and is_default = '1'
-    </update>
-
-    <update id="setDefaultById" parameterType="Long">
-        update biz_price_template set is_default = '1'
-        where price_template_id = #{priceTemplateId} and del_flag = '0'
     </update>
 
     <update id="deleteBizPriceTemplateById" parameterType="Long">
@@ -193,6 +113,11 @@
         <foreach item="priceTemplateId" collection="array" open="(" separator="," close=")">
             #{priceTemplateId}
         </foreach>
+    </update>
+
+    <update id="clearDefaultForOthers" parameterType="Long">
+        update biz_price_template set is_default = '0'
+        where price_template_id != #{priceTemplateId} and del_flag = '0'
     </update>
 
 </mapper>
