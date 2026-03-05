@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.api.mapper.BizDraftProductMapper">
+
+    <resultMap type="com.ruoyi.api.domain.BizDraftProduct" id="DraftResult">
+        <id     property="draftId"          column="draft_id" />
+        <result property="company"          column="company" />
+        <result property="productName"      column="product_name" />
+        <result property="productNumber"    column="product_number" />
+        <result property="searchName"       column="search_name" />
+        <result property="productType"      column="product_type" />
+        <result property="productSubType"   column="product_sub_type" />
+        <result property="itemGroupId"      column="item_group_id" />
+        <result property="itemModelGroupId" column="item_model_group_id" />
+        <result property="storageDimGroupId"  column="storage_dim_group_id" />
+        <result property="trackingDimGroupId" column="tracking_dim_group_id" />
+        <result property="buyerGroupId"     column="buyer_group_id" />
+        <result property="inventUnitId"     column="invent_unit_id" />
+        <result property="purchUnitId"      column="purch_unit_id" />
+        <result property="salesUnitId"      column="sales_unit_id" />
+        <result property="unitSeqGroupId"   column="unit_seq_group_id" />
+        <result property="purchasePrice"    column="purchase_price" />
+        <result property="salePrice"        column="sale_price" />
+        <result property="purchTaxGroupId"  column="purch_tax_group_id" />
+        <result property="salesTaxGroupId"  column="sales_tax_group_id" />
+        <result property="useLatestPurchPrice" column="use_latest_purch_price" />
+        <result property="useLatestCostPrice"  column="use_latest_cost_price" />
+        <result property="overDeliveryPct"  column="over_delivery_pct" />
+        <result property="underDeliveryPct" column="under_delivery_pct" />
+        <result property="vendorAccount"    column="vendor_account" />
+        <result property="vendorItemNumber" column="vendor_item_number" />
+        <result property="approvedVendorCheckMethod" column="approved_vendor_check_method" />
+        <result property="lifecycleStateId" column="lifecycle_state_id" />
+        <result property="retailCategoryId" column="retail_category_id" />
+        <result property="financialDimItemGroup" column="financial_dim_item_group" />
+        <result property="mobileDeviceDescLine1" column="mobile_device_desc_line1" />
+        <result property="mobileDeviceDescLine2" column="mobile_device_desc_line2" />
+        <result property="draftStatus"      column="draft_status" />
+        <result property="submitCount"      column="submit_count" />
+        <result property="lastSubmitTime"   column="last_submit_time" />
+        <result property="d365Response"     column="d365_response" />
+        <result property="errorMessage"     column="error_message" />
+        <result property="status"           column="status" />
+        <result property="delFlag"          column="del_flag" />
+        <result property="createBy"         column="create_by" />
+        <result property="createTime"       column="create_time" />
+        <result property="updateBy"         column="update_by" />
+        <result property="updateTime"       column="update_time" />
+        <result property="remark"           column="remark" />
+    </resultMap>
+
+    <sql id="selectVo">
+        select draft_id, company, product_name, product_number, search_name,
+               product_type, product_sub_type,
+               item_group_id, item_model_group_id, storage_dim_group_id, tracking_dim_group_id, buyer_group_id,
+               invent_unit_id, purch_unit_id, sales_unit_id, unit_seq_group_id,
+               purchase_price, sale_price, purch_tax_group_id, sales_tax_group_id,
+               use_latest_purch_price, use_latest_cost_price, over_delivery_pct, under_delivery_pct,
+               vendor_account, vendor_item_number, approved_vendor_check_method,
+               lifecycle_state_id, retail_category_id, financial_dim_item_group,
+               mobile_device_desc_line1, mobile_device_desc_line2,
+               draft_status, submit_count, last_submit_time, d365_response, error_message,
+               status, del_flag, create_by, create_time, update_by, update_time, remark
+        from biz_draft_product
+    </sql>
+
+    <select id="selectBizDraftProductList" parameterType="com.ruoyi.api.domain.BizDraftProduct" resultMap="DraftResult">
+        <include refid="selectVo"/>
+        <where>
+            del_flag = '0'
+            <if test="productName != null and productName != ''">AND product_name like concat('%', #{productName}, '%')</if>
+            <if test="productNumber != null and productNumber != ''">AND product_number like concat('%', #{productNumber}, '%')</if>
+            <if test="company != null and company != ''">AND company = #{company}</if>
+            <if test="draftStatus != null and draftStatus != ''">AND draft_status = #{draftStatus}</if>
+            <if test="status != null and status != ''">AND status = #{status}</if>
+        </where>
+        order by create_time desc
+    </select>
+
+    <select id="selectBizDraftProductById" parameterType="Long" resultMap="DraftResult">
+        <include refid="selectVo"/>
+        where draft_id = #{draftId} and del_flag = '0'
+    </select>
+
+    <insert id="insertBizDraftProduct" parameterType="com.ruoyi.api.domain.BizDraftProduct" useGeneratedKeys="true" keyProperty="draftId">
+        insert into biz_draft_product (
+            company, product_name, product_number, search_name, product_type, product_sub_type,
+            item_group_id, item_model_group_id, storage_dim_group_id, tracking_dim_group_id, buyer_group_id,
+            invent_unit_id, purch_unit_id, sales_unit_id, unit_seq_group_id,
+            purchase_price, sale_price, purch_tax_group_id, sales_tax_group_id,
+            use_latest_purch_price, use_latest_cost_price, over_delivery_pct, under_delivery_pct,
+            vendor_account, vendor_item_number, approved_vendor_check_method,
+            lifecycle_state_id, retail_category_id, financial_dim_item_group,
+            mobile_device_desc_line1, mobile_device_desc_line2,
+            draft_status, status, create_by, create_time, remark
+        ) values (
+            #{company}, #{productName}, #{productNumber}, #{searchName}, #{productType}, #{productSubType},
+            #{itemGroupId}, #{itemModelGroupId}, #{storageDimGroupId}, #{trackingDimGroupId}, #{buyerGroupId},
+            #{inventUnitId}, #{purchUnitId}, #{salesUnitId}, #{unitSeqGroupId},
+            #{purchasePrice}, #{salePrice}, #{purchTaxGroupId}, #{salesTaxGroupId},
+            #{useLatestPurchPrice}, #{useLatestCostPrice}, #{overDeliveryPct}, #{underDeliveryPct},
+            #{vendorAccount}, #{vendorItemNumber}, #{approvedVendorCheckMethod},
+            #{lifecycleStateId}, #{retailCategoryId}, #{financialDimItemGroup},
+            #{mobileDeviceDescLine1}, #{mobileDeviceDescLine2},
+            'draft', '0', #{createBy}, sysdate(), #{remark}
+        )
+    </insert>
+
+    <update id="updateBizDraftProduct" parameterType="com.ruoyi.api.domain.BizDraftProduct">
+        update biz_draft_product
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="company != null">company = #{company},</if>
+            <if test="productName != null">product_name = #{productName},</if>
+            <if test="productNumber != null">product_number = #{productNumber},</if>
+            <if test="searchName != null">search_name = #{searchName},</if>
+            <if test="productType != null">product_type = #{productType},</if>
+            <if test="productSubType != null">product_sub_type = #{productSubType},</if>
+            <if test="itemGroupId != null">item_group_id = #{itemGroupId},</if>
+            <if test="itemModelGroupId != null">item_model_group_id = #{itemModelGroupId},</if>
+            <if test="storageDimGroupId != null">storage_dim_group_id = #{storageDimGroupId},</if>
+            <if test="trackingDimGroupId != null">tracking_dim_group_id = #{trackingDimGroupId},</if>
+            <if test="buyerGroupId != null">buyer_group_id = #{buyerGroupId},</if>
+            <if test="inventUnitId != null">invent_unit_id = #{inventUnitId},</if>
+            <if test="purchUnitId != null">purch_unit_id = #{purchUnitId},</if>
+            <if test="salesUnitId != null">sales_unit_id = #{salesUnitId},</if>
+            <if test="unitSeqGroupId != null">unit_seq_group_id = #{unitSeqGroupId},</if>
+            <if test="purchasePrice != null">purchase_price = #{purchasePrice},</if>
+            <if test="salePrice != null">sale_price = #{salePrice},</if>
+            <if test="purchTaxGroupId != null">purch_tax_group_id = #{purchTaxGroupId},</if>
+            <if test="salesTaxGroupId != null">sales_tax_group_id = #{salesTaxGroupId},</if>
+            <if test="useLatestPurchPrice != null">use_latest_purch_price = #{useLatestPurchPrice},</if>
+            <if test="useLatestCostPrice != null">use_latest_cost_price = #{useLatestCostPrice},</if>
+            <if test="overDeliveryPct != null">over_delivery_pct = #{overDeliveryPct},</if>
+            <if test="underDeliveryPct != null">under_delivery_pct = #{underDeliveryPct},</if>
+            <if test="vendorAccount != null">vendor_account = #{vendorAccount},</if>
+            <if test="vendorItemNumber != null">vendor_item_number = #{vendorItemNumber},</if>
+            <if test="approvedVendorCheckMethod != null">approved_vendor_check_method = #{approvedVendorCheckMethod},</if>
+            <if test="lifecycleStateId != null">lifecycle_state_id = #{lifecycleStateId},</if>
+            <if test="retailCategoryId != null">retail_category_id = #{retailCategoryId},</if>
+            <if test="financialDimItemGroup != null">financial_dim_item_group = #{financialDimItemGroup},</if>
+            <if test="mobileDeviceDescLine1 != null">mobile_device_desc_line1 = #{mobileDeviceDescLine1},</if>
+            <if test="mobileDeviceDescLine2 != null">mobile_device_desc_line2 = #{mobileDeviceDescLine2},</if>
+            <if test="draftStatus != null">draft_status = #{draftStatus},</if>
+            <if test="submitCount != null">submit_count = #{submitCount},</if>
+            <if test="lastSubmitTime != null">last_submit_time = #{lastSubmitTime},</if>
+            <if test="d365Response != null">d365_response = #{d365Response},</if>
+            <if test="errorMessage != null">error_message = #{errorMessage},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            update_time = sysdate(),
+            <if test="remark != null">remark = #{remark},</if>
+        </trim>
+        where draft_id = #{draftId}
+    </update>
+
+    <update id="deleteBizDraftProductByIds" parameterType="String">
+        update biz_draft_product set del_flag = '2' where draft_id in
+        <foreach item="draftId" collection="array" open="(" separator="," close=")">#{draftId}</foreach>
+    </update>
+
+</mapper>

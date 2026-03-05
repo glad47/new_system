@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.api.mapper.BizD365ConfigMapper">
+
+    <resultMap type="com.ruoyi.api.domain.BizD365Config" id="BizD365ConfigResult">
+        <id     property="configId"    column="config_id"    />
+        <result property="configKey"   column="config_key"   />
+        <result property="configValue" column="config_value" />
+        <result property="configLabel" column="config_label" />
+        <result property="configType"  column="config_type"  />
+        <result property="status"      column="status"       />
+        <result property="delFlag"     column="del_flag"     />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"  column="create_time"  />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"  column="update_time"  />
+        <result property="remark"      column="remark"       />
+    </resultMap>
+
+    <sql id="selectVo">
+        select config_id, config_key, config_value, config_label, config_type,
+               status, del_flag, create_by, create_time, update_by, update_time, remark
+        from biz_d365_config
+    </sql>
+
+    <select id="selectBizD365ConfigList" parameterType="com.ruoyi.api.domain.BizD365Config" resultMap="BizD365ConfigResult">
+        <include refid="selectVo"/>
+        <where>
+            del_flag = '0'
+            <if test="configKey != null and configKey != ''">
+                AND config_key like concat('%', #{configKey}, '%')
+            </if>
+            <if test="configLabel != null and configLabel != ''">
+                AND config_label like concat('%', #{configLabel}, '%')
+            </if>
+            <if test="status != null and status != ''">
+                AND status = #{status}
+            </if>
+        </where>
+        order by config_id asc
+    </select>
+
+    <select id="selectBizD365ConfigById" parameterType="Long" resultMap="BizD365ConfigResult">
+        <include refid="selectVo"/>
+        where config_id = #{configId} and del_flag = '0'
+    </select>
+
+    <select id="selectBizD365ConfigByKey" parameterType="String" resultMap="BizD365ConfigResult">
+        <include refid="selectVo"/>
+        where config_key = #{configKey} and del_flag = '0'
+        limit 1
+    </select>
+
+    <insert id="insertBizD365Config" parameterType="com.ruoyi.api.domain.BizD365Config" useGeneratedKeys="true" keyProperty="configId">
+        insert into biz_d365_config
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="configKey != null and configKey != ''">config_key,</if>
+            <if test="configValue != null">config_value,</if>
+            <if test="configLabel != null">config_label,</if>
+            <if test="configType != null">config_type,</if>
+            <if test="status != null">status,</if>
+            <if test="createBy != null">create_by,</if>
+            create_time,
+            <if test="remark != null">remark,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="configKey != null and configKey != ''">#{configKey},</if>
+            <if test="configValue != null">#{configValue},</if>
+            <if test="configLabel != null">#{configLabel},</if>
+            <if test="configType != null">#{configType},</if>
+            <if test="status != null">#{status},</if>
+            <if test="createBy != null">#{createBy},</if>
+            sysdate(),
+            <if test="remark != null">#{remark},</if>
+        </trim>
+    </insert>
+
+    <update id="updateBizD365Config" parameterType="com.ruoyi.api.domain.BizD365Config">
+        update biz_d365_config
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="configKey != null and configKey != ''">config_key = #{configKey},</if>
+            <if test="configValue != null">config_value = #{configValue},</if>
+            <if test="configLabel != null">config_label = #{configLabel},</if>
+            <if test="configType != null">config_type = #{configType},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            update_time = sysdate(),
+            <if test="remark != null">remark = #{remark},</if>
+        </trim>
+        where config_id = #{configId}
+    </update>
+
+    <delete id="deleteBizD365ConfigByIds" parameterType="String">
+        update biz_d365_config set del_flag = '2' where config_id in
+        <foreach item="configId" collection="array" open="(" separator="," close=")">
+            #{configId}
+        </foreach>
+    </delete>
+
+</mapper>
