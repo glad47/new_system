@@ -18,116 +18,77 @@ public class BizDraftProductServiceImpl implements IBizDraftProductService
 {
     private static final Logger log = LoggerFactory.getLogger(BizDraftProductServiceImpl.class);
 
-    @Autowired
-    private BizDraftProductMapper mapper;
+    @Autowired private BizDraftProductMapper mapper;
+    @Autowired private ID365ProxyService d365ProxyService;
 
-    @Autowired
-    private ID365ProxyService d365ProxyService;
+    @Override public List<BizDraftProduct> selectList(BizDraftProduct d) { return mapper.selectBizDraftProductList(d); }
+    @Override public BizDraftProduct selectById(Long id) { return mapper.selectBizDraftProductById(id); }
 
     @Override
-    public List<BizDraftProduct> selectList(BizDraftProduct draft) {
-        return mapper.selectBizDraftProductList(draft);
+    public int insert(BizDraftProduct d) {
+        d.setDraftStatus("draft");
+        d.setSubmitCount(0);
+        try { d.setCreateBy(SecurityUtils.getUsername()); } catch (Exception ignored) {}
+        return mapper.insertBizDraftProduct(d);
     }
 
     @Override
-    public BizDraftProduct selectById(Long draftId) {
-        return mapper.selectBizDraftProductById(draftId);
+    public int update(BizDraftProduct d) {
+        try { d.setUpdateBy(SecurityUtils.getUsername()); } catch (Exception ignored) {}
+        return mapper.updateBizDraftProduct(d);
     }
 
-    @Override
-    public int insert(BizDraftProduct draft) {
-        draft.setDraftStatus("draft");
-        draft.setSubmitCount(0);
-        draft.setCreateBy(SecurityUtils.getUsername());
-        return mapper.insertBizDraftProduct(draft);
-    }
+    @Override public int deleteByIds(Long[] ids) { return mapper.deleteBizDraftProductByIds(ids); }
 
     @Override
-    public int update(BizDraftProduct draft) {
-        draft.setUpdateBy(SecurityUtils.getUsername());
-        return mapper.updateBizDraftProduct(draft);
-    }
-
-    @Override
-    public int deleteByIds(Long[] draftIds) {
-        return mapper.deleteBizDraftProductByIds(draftIds);
-    }
-
-    @Override
-    public BizDraftProduct submitToD365(Long draftId)
-    {
+    public BizDraftProduct submitToD365(Long draftId) {
         BizDraftProduct draft = mapper.selectBizDraftProductById(draftId);
-        if (draft == null) {
-            throw new RuntimeException("Draft not found: " + draftId);
-        }
+        if (draft == null) throw new RuntimeException("Draft not found: " + draftId);
 
-        // Build D365 contract from draft fields
         Map<String, Object> contract = draft.toD365Contract();
-
-        // Update status to "submitted"
         draft.setDraftStatus("submitted");
         draft.setSubmitCount((draft.getSubmitCount() != null ? draft.getSubmitCount() : 0) + 1);
         draft.setLastSubmitTime(new Date());
-        draft.setUpdateBy(SecurityUtils.getUsername());
+        try { draft.setUpdateBy(SecurityUtils.getUsername()); } catch (Exception ignored) {}
         mapper.updateBizDraftProduct(draft);
 
-        try
-        {
-            // Call D365 via backend proxy
+        try {
             String response = d365ProxyService.createProduct(contract);
-            log.info("D365 createProduct response for draft {}: {}", draftId, response);
-
-            // Check response for success/failure
-            // D365 typically returns an error message or the product number on success
-            boolean isError = response != null && (
-                response.contains("\"error\"") ||
-                response.contains("\"Error\"") ||
-                response.contains("\"exception\"") ||
-                response.contains("\"Exception\"")
-            );
-
+            boolean isError = response != null && (response.contains("\"error\"") || response.contains("\"Error\"") || response.contains("\"exception\""));
             if (isError) {
                 draft.setDraftStatus("failed");
-                draft.setErrorMessage(response != null && response.length() > 2000
-                    ? response.substring(0, 2000) : response);
+                draft.setErrorMessage(response.length() > 2000 ? response.substring(0, 2000) : response);
             } else {
                 draft.setDraftStatus("success");
                 draft.setErrorMessage(null);
             }
-            draft.setD365Response(response != null && response.length() > 4000
-                ? response.substring(0, 4000) : response);
-        }
-        catch (Exception e)
-        {
+            draft.setD365Response(response != null && response.length() > 4000 ? response.substring(0, 4000) : response);
+        } catch (Exception e) {
             log.error("D365 submit failed for draft {}", draftId, e);
             draft.setDraftStatus("failed");
-            draft.setErrorMessage(e.getMessage() != null && e.getMessage().length() > 2000
-                ? e.getMessage().substring(0, 2000) : e.getMessage());
+            draft.setErrorMessage(e.getMessage() != null && e.getMessage().length() > 2000 ? e.getMessage().substring(0, 2000) : e.getMessage());
         }
-
-        draft.setUpdateBy(SecurityUtils.getUsername());
         mapper.updateBizDraftProduct(draft);
         return draft;
     }
 
     @Override
-    public int submitAllDrafts()
-    {
-        BizDraftProduct query = new BizDraftProduct();
-        query.setDraftStatus("draft");
-        List<BizDraftProduct> drafts = mapper.selectBizDraftProductList(query);
-
-        int successCount = 0;
-        for (BizDraftProduct draft : drafts) {
+    public int submitAllDrafts() {
+        BizDraftProduct q = new BizDraftProduct();
+        q.setDraftStatus("draft");
+        List<BizDraftProduct> drafts = mapper.selectBizDraftProductList(q);
+        int ok = 0;
+        for (BizDraftProduct d : drafts) {
             try {
-                BizDraftProduct result = submitToD365(draft.getDraftId());
-                if ("success".equals(result.getDraftStatus())) {
-                    successCount++;
+                BizDraftProduct r = submitToD365(d.getDraftId());
+                if ("success".equals(r.getDraftStatus())) {
+                    mapper.deleteBizDraftProductByIds(new Long[]{d.getDraftId()});
+                    ok++;
                 }
             } catch (Exception e) {
-                log.error("Batch submit failed for draft {}", draft.getDraftId(), e);
+                log.error("Batch submit fail for draft {}", d.getDraftId(), e);
             }
         }
-        return successCount;
+        return ok;
     }
 }
