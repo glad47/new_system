@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.BizPriceCheckCarouselMapper">
+    
+    <resultMap type="BizPriceCheckCarousel" id="BizPriceCheckCarouselResult">
+        <result property="carouselId"       column="carousel_id"       />
+        <result property="imageName"        column="image_name"        />
+        <result property="imageUrl"         column="image_url"         />
+        <result property="originalFilename" column="original_filename" />
+        <result property="imageType"        column="image_type"        />
+        <result property="imageSize"        column="image_size"        />
+        <result property="displayOrder"     column="display_order"     />
+        <result property="isActive"         column="is_active"         />
+        <result property="displayDuration"  column="display_duration"  />
+        <result property="status"           column="status"            />
+        <result property="delFlag"          column="del_flag"          />
+        <result property="createBy"         column="create_by"         />
+        <result property="createTime"       column="create_time"       />
+        <result property="updateBy"         column="update_by"         />
+        <result property="updateTime"       column="update_time"       />
+        <result property="remark"           column="remark"            />
+    </resultMap>
+
+    <sql id="selectBizPriceCheckCarouselVo">
+        select carousel_id, image_name, image_url, original_filename, image_type, image_size, 
+               display_order, is_active, display_duration, status, del_flag, 
+               create_by, create_time, update_by, update_time, remark
+        from biz_price_check_carousel
+    </sql>
+
+    <select id="selectBizPriceCheckCarouselList" parameterType="BizPriceCheckCarousel" resultMap="BizPriceCheckCarouselResult">
+        <include refid="selectBizPriceCheckCarouselVo"/>
+        <where>  
+            <if test="imageName != null and imageName != ''">
+                and image_name like concat('%', #{imageName}, '%')
+            </if>
+            <if test="isActive != null and isActive != ''">
+                and is_active = #{isActive}
+            </if>
+            <if test="status != null and status != ''">
+                and status = #{status}
+            </if>
+            and del_flag = '0'
+        </where>
+        order by display_order asc, create_time desc
+    </select>
+    
+    <select id="selectBizPriceCheckCarouselByCarouselId" parameterType="Long" resultMap="BizPriceCheckCarouselResult">
+        <include refid="selectBizPriceCheckCarouselVo"/>
+        where carousel_id = #{carouselId}
+    </select>
+        
+    <insert id="insertBizPriceCheckCarousel" parameterType="BizPriceCheckCarousel" useGeneratedKeys="true" keyProperty="carouselId">
+        insert into biz_price_check_carousel
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="imageName != null and imageName != ''">image_name,</if>
+            <if test="imageUrl != null and imageUrl != ''">image_url,</if>
+            <if test="originalFilename != null">original_filename,</if>
+            <if test="imageType != null">image_type,</if>
+            <if test="imageSize != null">image_size,</if>
+            <if test="displayOrder != null">display_order,</if>
+            <if test="isActive != null">is_active,</if>
+            <if test="displayDuration != null">display_duration,</if>
+            <if test="status != null">status,</if>
+            <if test="delFlag != null">del_flag,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="remark != null">remark,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="imageName != null and imageName != ''">#{imageName},</if>
+            <if test="imageUrl != null and imageUrl != ''">#{imageUrl},</if>
+            <if test="originalFilename != null">#{originalFilename},</if>
+            <if test="imageType != null">#{imageType},</if>
+            <if test="imageSize != null">#{imageSize},</if>
+            <if test="displayOrder != null">#{displayOrder},</if>
+            <if test="isActive != null">#{isActive},</if>
+            <if test="displayDuration != null">#{displayDuration},</if>
+            <if test="status != null">#{status},</if>
+            <if test="delFlag != null">#{delFlag},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="remark != null">#{remark},</if>
+         </trim>
+    </insert>
+
+    <update id="updateBizPriceCheckCarousel" parameterType="BizPriceCheckCarousel">
+        update biz_price_check_carousel
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="imageName != null and imageName != ''">image_name = #{imageName},</if>
+            <if test="imageUrl != null and imageUrl != ''">image_url = #{imageUrl},</if>
+            <if test="originalFilename != null">original_filename = #{originalFilename},</if>
+            <if test="imageType != null">image_type = #{imageType},</if>
+            <if test="imageSize != null">image_size = #{imageSize},</if>
+            <if test="displayOrder != null">display_order = #{displayOrder},</if>
+            <if test="isActive != null">is_active = #{isActive},</if>
+            <if test="displayDuration != null">display_duration = #{displayDuration},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="delFlag != null">del_flag = #{delFlag},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </trim>
+        where carousel_id = #{carouselId}
+    </update>
+
+    <delete id="deleteBizPriceCheckCarouselByCarouselId" parameterType="Long">
+        update biz_price_check_carousel set del_flag = '2' where carousel_id = #{carouselId}
+    </delete>
+
+    <delete id="deleteBizPriceCheckCarouselByCarouselIds" parameterType="String">
+        update biz_price_check_carousel set del_flag = '2' where carousel_id in 
+        <foreach item="carouselId" collection="array" open="(" separator="," close=")">
+            #{carouselId}
+        </foreach>
+    </delete>
+</mapper>
