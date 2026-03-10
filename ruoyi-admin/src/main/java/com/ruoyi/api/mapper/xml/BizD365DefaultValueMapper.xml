@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.api.mapper.BizD365DefaultValueMapper">
+
+    <resultMap type="com.ruoyi.api.domain.BizD365DefaultValue" id="DefaultValueResult">
+        <id     property="defaultId"     column="default_id"/>
+        <result property="endpointName"  column="endpoint_name"/>
+        <result property="endpointLabel" column="endpoint_label"/>
+        <result property="extraParams"   column="extra_params"/>
+        <result property="defaultValue"  column="default_value"/>
+        <result property="defaultLabel"  column="default_label"/>
+        <result property="showInUi"      column="show_in_ui"/>
+        <result property="status"        column="status"/>
+        <result property="delFlag"       column="del_flag"/>
+        <result property="createBy"      column="create_by"/>
+        <result property="createTime"    column="create_time"/>
+        <result property="updateBy"      column="update_by"/>
+        <result property="updateTime"    column="update_time"/>
+        <result property="remark"        column="remark"/>
+    </resultMap>
+
+    <sql id="selectCols">
+        default_id, endpoint_name, endpoint_label, extra_params,
+        default_value, default_label, show_in_ui, status, del_flag,
+        create_by, create_time, update_by, update_time, remark
+    </sql>
+
+    <select id="selectList" parameterType="com.ruoyi.api.domain.BizD365DefaultValue" resultMap="DefaultValueResult">
+        select <include refid="selectCols"/>
+        from biz_d365_default_value
+        <where>
+            del_flag = '0'
+            <if test="endpointName != null and endpointName != ''">AND endpoint_name like concat('%',#{endpointName},'%')</if>
+            <if test="showInUi != null and showInUi != ''">AND show_in_ui = #{showInUi}</if>
+            <if test="status != null and status != ''">AND status = #{status}</if>
+        </where>
+        order by default_id
+    </select>
+
+    <select id="selectById" parameterType="Long" resultMap="DefaultValueResult">
+        select <include refid="selectCols"/>
+        from biz_d365_default_value where default_id = #{defaultId} and del_flag = '0'
+    </select>
+
+    <select id="selectByEndpoint" resultMap="DefaultValueResult">
+        select <include refid="selectCols"/>
+        from biz_d365_default_value
+        where endpoint_name = #{param1}
+          and (extra_params = #{param2} or (#{param2} is null and extra_params is null))
+          and del_flag = '0'
+        limit 1
+    </select>
+
+    <select id="selectAllDefaults" resultMap="DefaultValueResult">
+        select <include refid="selectCols"/>
+        from biz_d365_default_value
+        where del_flag = '0' and status = '0' and default_value is not null and default_value != ''
+        order by default_id
+    </select>
+
+    <insert id="insert" parameterType="com.ruoyi.api.domain.BizD365DefaultValue" useGeneratedKeys="true" keyProperty="defaultId">
+        insert into biz_d365_default_value (endpoint_name, endpoint_label, extra_params,
+            default_value, default_label, show_in_ui, status, del_flag, create_by, create_time, remark)
+        values (#{endpointName}, #{endpointLabel}, #{extraParams},
+            #{defaultValue}, #{defaultLabel}, #{showInUi}, #{status}, '0', #{createBy}, sysdate(), #{remark})
+    </insert>
+
+    <update id="update" parameterType="com.ruoyi.api.domain.BizD365DefaultValue">
+        update biz_d365_default_value
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="endpointLabel != null">endpoint_label=#{endpointLabel},</if>
+            <if test="extraParams != null">extra_params=#{extraParams},</if>
+            <if test="defaultValue != null">default_value=#{defaultValue},</if>
+            <if test="defaultLabel != null">default_label=#{defaultLabel},</if>
+            <if test="showInUi != null">show_in_ui=#{showInUi},</if>
+            <if test="status != null">status=#{status},</if>
+            <if test="remark != null">remark=#{remark},</if>
+            <if test="updateBy != null">update_by=#{updateBy},</if>
+            update_time=sysdate(),
+        </trim>
+        where default_id = #{defaultId}
+    </update>
+
+    <delete id="deleteByIds" parameterType="String">
+        update biz_d365_default_value set del_flag = '2' where default_id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">#{id}</foreach>
+    </delete>
+</mapper>

@@ -70,7 +70,7 @@ public class BizD365ProxyController extends BaseController
         String[] ok = {"getItemGroups","getItemModelGroups","getVendors","getBuyerGroups","getTaxItemGroups",
             "getStorageDimensionGroups","getTrackingDimensionGroups","getUnitsOfMeasure","getLifecycleStates",
             "getUnitSequenceGroups","getRetailCategories","getCategoryHierarchies","getProductTypes",
-            "getProductSubTypes","getApprovedVendorCheckMethods","getProductByNumber"};
+            "getProductSubTypes","getApprovedVendorCheckMethods","getProductByNumber", "getRetailBarcodeSetup", "getTradeAgreements"};
         boolean allowed = false;
         for (String o : ok) if (o.equals(operation)) { allowed = true; break; }
         if (!allowed) return error("Not allowed: " + operation);
