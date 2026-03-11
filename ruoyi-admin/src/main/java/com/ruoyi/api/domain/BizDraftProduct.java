@@ -71,6 +71,19 @@ public class BizDraftProduct extends BaseEntity
     private String mobileDeviceDescLine1;
     private String mobileDeviceDescLine2;
 
+    // ── NEW: Barcode & Weighted ──
+    private String mainBarcode;
+    private Integer isWeighted;
+    private String packingBarcodesJson;
+
+    // ── NEW: Trade Agreement Prices ──
+    private BigDecimal priceGroupPurchPrice;
+    private BigDecimal priceGroupSalePrice;
+    private String purchFromDate;
+    private String purchToDate;
+    private String salesFromDate;
+    private String salesToDate;
+
     // ── Draft Status Tracking ──
 
     @Excel(name = "Draft Status")
@@ -119,6 +132,14 @@ public class BizDraftProduct extends BaseEntity
         if (mobileDeviceDescLine1 != null) c.put("mobileDeviceDescLine1", mobileDeviceDescLine1);
         if (mobileDeviceDescLine2 != null) c.put("mobileDeviceDescLine2", mobileDeviceDescLine2);
         if (approvedVendorCheckMethod != null) c.put("approvedVendorCheckMethod", approvedVendorCheckMethod);
+        // New fields
+        if (mainBarcode != null)        c.put("mainBarcode", mainBarcode);
+        if (priceGroupPurchPrice != null) c.put("priceGroupPurchPrice", priceGroupPurchPrice);
+        if (priceGroupSalePrice != null)  c.put("priceGroupSalePrice", priceGroupSalePrice);
+        if (purchFromDate != null)      c.put("purchFromDate", purchFromDate);
+        if (purchToDate != null)        c.put("purchToDate", purchToDate);
+        if (salesFromDate != null)      c.put("salesFromDate", salesFromDate);
+        if (salesToDate != null)        c.put("salesToDate", salesToDate);
         return c;
     }
 
@@ -219,6 +240,37 @@ public class BizDraftProduct extends BaseEntity
 
     public String getMobileDeviceDescLine2() { return mobileDeviceDescLine2; }
     public void setMobileDeviceDescLine2(String mobileDeviceDescLine2) { this.mobileDeviceDescLine2 = mobileDeviceDescLine2; }
+
+    // ── NEW field getters/setters ──
+
+    public String getMainBarcode() { return mainBarcode; }
+    public void setMainBarcode(String mainBarcode) { this.mainBarcode = mainBarcode; }
+
+    public Integer getIsWeighted() { return isWeighted; }
+    public void setIsWeighted(Integer isWeighted) { this.isWeighted = isWeighted; }
+
+    public String getPackingBarcodesJson() { return packingBarcodesJson; }
+    public void setPackingBarcodesJson(String packingBarcodesJson) { this.packingBarcodesJson = packingBarcodesJson; }
+
+    public BigDecimal getPriceGroupPurchPrice() { return priceGroupPurchPrice; }
+    public void setPriceGroupPurchPrice(BigDecimal priceGroupPurchPrice) { this.priceGroupPurchPrice = priceGroupPurchPrice; }
+
+    public BigDecimal getPriceGroupSalePrice() { return priceGroupSalePrice; }
+    public void setPriceGroupSalePrice(BigDecimal priceGroupSalePrice) { this.priceGroupSalePrice = priceGroupSalePrice; }
+
+    public String getPurchFromDate() { return purchFromDate; }
+    public void setPurchFromDate(String purchFromDate) { this.purchFromDate = purchFromDate; }
+
+    public String getPurchToDate() { return purchToDate; }
+    public void setPurchToDate(String purchToDate) { this.purchToDate = purchToDate; }
+
+    public String getSalesFromDate() { return salesFromDate; }
+    public void setSalesFromDate(String salesFromDate) { this.salesFromDate = salesFromDate; }
+
+    public String getSalesToDate() { return salesToDate; }
+    public void setSalesToDate(String salesToDate) { this.salesToDate = salesToDate; }
+
+    // ── Existing status getters/setters ──
 
     public String getDraftStatus() { return draftStatus; }
     public void setDraftStatus(String draftStatus) { this.draftStatus = draftStatus; }

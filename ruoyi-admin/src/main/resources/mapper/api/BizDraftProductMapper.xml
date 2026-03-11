@@ -35,6 +35,17 @@
         <result property="financialDimItemGroup" column="financial_dim_item_group" />
         <result property="mobileDeviceDescLine1" column="mobile_device_desc_line1" />
         <result property="mobileDeviceDescLine2" column="mobile_device_desc_line2" />
+        <!-- NEW FIELDS -->
+        <result property="mainBarcode"          column="main_barcode" />
+        <result property="isWeighted"           column="is_weighted" />
+        <result property="packingBarcodesJson"  column="packing_barcodes_json" />
+        <result property="priceGroupPurchPrice" column="price_group_purch_price" />
+        <result property="priceGroupSalePrice"  column="price_group_sale_price" />
+        <result property="purchFromDate"        column="purch_from_date" />
+        <result property="purchToDate"          column="purch_to_date" />
+        <result property="salesFromDate"        column="sales_from_date" />
+        <result property="salesToDate"          column="sales_to_date" />
+        <!-- END NEW -->
         <result property="draftStatus"      column="draft_status" />
         <result property="submitCount"      column="submit_count" />
         <result property="lastSubmitTime"   column="last_submit_time" />
@@ -59,6 +70,9 @@
                vendor_account, vendor_item_number, approved_vendor_check_method,
                lifecycle_state_id, retail_category_id, financial_dim_item_group,
                mobile_device_desc_line1, mobile_device_desc_line2,
+               main_barcode, is_weighted, packing_barcodes_json,
+               price_group_purch_price, price_group_sale_price,
+               purch_from_date, purch_to_date, sales_from_date, sales_to_date,
                draft_status, submit_count, last_submit_time, d365_response, error_message,
                status, del_flag, create_by, create_time, update_by, update_time, remark
         from biz_draft_product
@@ -92,6 +106,9 @@
             vendor_account, vendor_item_number, approved_vendor_check_method,
             lifecycle_state_id, retail_category_id, financial_dim_item_group,
             mobile_device_desc_line1, mobile_device_desc_line2,
+            main_barcode, is_weighted, packing_barcodes_json,
+            price_group_purch_price, price_group_sale_price,
+            purch_from_date, purch_to_date, sales_from_date, sales_to_date,
             draft_status, status, create_by, create_time, remark
         ) values (
             #{company}, #{productName}, #{productNumber}, #{searchName}, #{productType}, #{productSubType},
@@ -102,6 +119,9 @@
             #{vendorAccount}, #{vendorItemNumber}, #{approvedVendorCheckMethod},
             #{lifecycleStateId}, #{retailCategoryId}, #{financialDimItemGroup},
             #{mobileDeviceDescLine1}, #{mobileDeviceDescLine2},
+            #{mainBarcode}, #{isWeighted}, #{packingBarcodesJson},
+            #{priceGroupPurchPrice}, #{priceGroupSalePrice},
+            #{purchFromDate}, #{purchToDate}, #{salesFromDate}, #{salesToDate},
             'draft', '0', #{createBy}, sysdate(), #{remark}
         )
     </insert>
@@ -140,6 +160,17 @@
             <if test="financialDimItemGroup != null">financial_dim_item_group = #{financialDimItemGroup},</if>
             <if test="mobileDeviceDescLine1 != null">mobile_device_desc_line1 = #{mobileDeviceDescLine1},</if>
             <if test="mobileDeviceDescLine2 != null">mobile_device_desc_line2 = #{mobileDeviceDescLine2},</if>
+            <!-- NEW FIELDS -->
+            <if test="mainBarcode != null">main_barcode = #{mainBarcode},</if>
+            <if test="isWeighted != null">is_weighted = #{isWeighted},</if>
+            <if test="packingBarcodesJson != null">packing_barcodes_json = #{packingBarcodesJson},</if>
+            <if test="priceGroupPurchPrice != null">price_group_purch_price = #{priceGroupPurchPrice},</if>
+            <if test="priceGroupSalePrice != null">price_group_sale_price = #{priceGroupSalePrice},</if>
+            <if test="purchFromDate != null">purch_from_date = #{purchFromDate},</if>
+            <if test="purchToDate != null">purch_to_date = #{purchToDate},</if>
+            <if test="salesFromDate != null">sales_from_date = #{salesFromDate},</if>
+            <if test="salesToDate != null">sales_to_date = #{salesToDate},</if>
+            <!-- END NEW -->
             <if test="draftStatus != null">draft_status = #{draftStatus},</if>
             <if test="submitCount != null">submit_count = #{submitCount},</if>
             <if test="lastSubmitTime != null">last_submit_time = #{lastSubmitTime},</if>

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.api.mapper.BizTradeAgreementConfigMapper">
+
+    <resultMap type="com.ruoyi.api.domain.BizTradeAgreementConfig" id="TradeConfigResult">
+        <id     property="configId"    column="config_id"/>
+        <result property="configKey"   column="config_key"/>
+        <result property="configValue" column="config_value"/>
+        <result property="configLabel" column="config_label"/>
+        <result property="configGroup" column="config_group"/>
+        <result property="status"      column="status"/>
+        <result property="createBy"    column="create_by"/>
+        <result property="createTime"  column="create_time"/>
+        <result property="updateBy"    column="update_by"/>
+        <result property="updateTime"  column="update_time"/>
+        <result property="remark"      column="remark"/>
+    </resultMap>
+
+    <sql id="selectCols">
+        config_id, config_key, config_value, config_label, config_group,
+        status, create_by, create_time, update_by, update_time, remark
+    </sql>
+
+    <!-- Select all active config rows -->
+    <select id="selectAll" resultMap="TradeConfigResult">
+        select <include refid="selectCols"/>
+        from biz_trade_agreement_config
+        where status = '0'
+        order by config_group, config_id
+    </select>
+
+    <!-- Select by config_key -->
+    <select id="selectByKey" parameterType="String" resultMap="TradeConfigResult">
+        select <include refid="selectCols"/>
+        from biz_trade_agreement_config
+        where config_key = #{configKey} and status = '0'
+        limit 1
+    </select>
+
+    <!-- Update value by config_key -->
+    <update id="updateByKey" parameterType="com.ruoyi.api.domain.BizTradeAgreementConfig">
+        update biz_trade_agreement_config
+        set config_value = #{configValue},
+        update_by    = #{updateBy},
+        update_time  = sysdate()
+        where config_key = #{configKey}
+    </update>
+
+    <!-- Insert new config row -->
+    <insert id="insert" parameterType="com.ruoyi.api.domain.BizTradeAgreementConfig" useGeneratedKeys="true" keyProperty="configId">
+        insert into biz_trade_agreement_config (config_key, config_value, config_label, config_group, status, create_by, create_time, remark)
+        values (#{configKey}, #{configValue}, #{configLabel}, #{configGroup}, #{status}, #{createBy}, sysdate(), #{remark})
+    </insert>
+
+</mapper>

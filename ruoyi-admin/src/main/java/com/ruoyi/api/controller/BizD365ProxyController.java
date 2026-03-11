@@ -68,9 +68,11 @@ public class BizD365ProxyController extends BaseController
     @PostMapping("/lookup/{operation}")
     public AjaxResult lookup(@PathVariable String operation, @RequestBody(required = false) Map<String, Object> extra) {
         String[] ok = {"getItemGroups","getItemModelGroups","getVendors","getBuyerGroups","getTaxItemGroups",
-            "getStorageDimensionGroups","getTrackingDimensionGroups","getUnitsOfMeasure","getLifecycleStates",
-            "getUnitSequenceGroups","getRetailCategories","getCategoryHierarchies","getProductTypes",
-            "getProductSubTypes","getApprovedVendorCheckMethods","getProductByNumber", "getRetailBarcodeSetup", "getTradeAgreements"};
+                "getStorageDimensionGroups","getTrackingDimensionGroups","getUnitsOfMeasure","getLifecycleStates",
+                "getUnitSequenceGroups","getRetailCategories","getCategoryHierarchies","getProductTypes",
+                "getProductSubTypes","getApprovedVendorCheckMethods","getProductByNumber","getRetailBarcodeSetup",
+                "getTradeAgreements","getCurrencies","getTradeAgreementRelations","getPartyCodeTypes",
+                "getAccountSelections","getItemRelations","getPriceGroups"};
         boolean allowed = false;
         for (String o : ok) if (o.equals(operation)) { allowed = true; break; }
         if (!allowed) return error("Not allowed: " + operation);
