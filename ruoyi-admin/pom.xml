@@ -84,7 +84,38 @@
                     <failOnMissingWebXml>false</failOnMissingWebXml>
                     <warName>${project.artifactId}</warName>
                 </configuration>   
-           </plugin>   
+           </plugin>
+
+
+            <plugin>
+                <groupId>com.google.cloud.tools</groupId>
+                <artifactId>jib-maven-plugin</artifactId>
+                <version>3.4.0</version>
+                <configuration>
+                    <from>
+                        <image>glad47/openjdk-alpine-tz:8</image>
+                    </from>
+                    <to>
+                        <image>glad47/ry-react-backend:02</image>
+                        <auth>
+                            <username>glad47</username>
+                            <password>zz0864975</password>
+                        </auth>
+                    </to>
+                    <container>
+                        <mainClass>com.ruoyi.RuoYiApplication</mainClass>
+                        <ports>
+                            <port>8080</port>
+                        </ports>
+                        <jvmFlags>
+                            <jvmFlag>-Dspring.profiles.active=prod</jvmFlag>
+                        </jvmFlags>
+                    </container>
+                </configuration>
+            </plugin>
+
+
+
         </plugins>
         <finalName>${project.artifactId}</finalName>
     </build>

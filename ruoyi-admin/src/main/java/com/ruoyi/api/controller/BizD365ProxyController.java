@@ -72,7 +72,7 @@ public class BizD365ProxyController extends BaseController
                 "getUnitSequenceGroups","getRetailCategories","getCategoryHierarchies","getProductTypes",
                 "getProductSubTypes","getApprovedVendorCheckMethods","getProductByNumber","getRetailBarcodeSetup",
                 "getTradeAgreements","getCurrencies","getTradeAgreementRelations","getPartyCodeTypes",
-                "getAccountSelections","getItemRelations","getPriceGroups"};
+                "getAccountSelections","getItemRelations","getPriceGroups", "getProductByBarcode"};
         boolean allowed = false;
         for (String o : ok) if (o.equals(operation)) { allowed = true; break; }
         if (!allowed) return error("Not allowed: " + operation);
